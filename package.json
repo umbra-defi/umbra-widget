@@ -1,6 +1,6 @@
 {
   "name": "@umbra-privacy/widget",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Embeddable Umbra privacy wallet — shield / private send / unshield / receive — in a single React component.",
   "type": "module",
   "license": "UNLICENSED",
