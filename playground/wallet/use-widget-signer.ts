@@ -1,37 +1,41 @@
 import { useMemo } from 'react'
 import {
   useWalletAccountMessageSigner,
-  useWalletAccountTransactionSendingSigner
+  useWalletAccountTransactionSendingSigner,
+  useWalletAccountTransactionSigner
 } from '@solana/react'
 import type { UiWalletAccount } from '@wallet-standard/react'
 import type { WidgetSigner } from '@/index'
 
 /**
- * Adapt a connected Wallet Standard account to the widget's {@link WidgetSigner}
- * (kit `TransactionSendingSigner & MessagePartialSigner`).
+ * Adapt a connected Wallet Standard account to the widget's {@link WidgetSigner}.
  *
- * The wallet hooks vend a `TransactionSendingSigner` (wallet owns the RPC, so it
- * signs *and* sends) and a `MessageModifyingSigner`. The widget expects a
- * `MessagePartialSigner` (`signMessages`), so we bridge `modifyAndSignMessages`
- * → `signMessages` by dropping the (unused) modified content and keeping the
- * signature dictionaries.
+ * The Umbra deposit/withdraw pipeline needs a signer that returns the SIGNED
+ * transaction (it submits the bytes itself), so we use
+ * `useWalletAccountTransactionSigner` — a `TransactionModifyingSigner`
+ * (`modifyAndSignTransactions`, backed by the wallet's `solana:signTransaction`
+ * feature). The sending signer is exposed too as an optional fast path for
+ * flows that just sign-and-broadcast. `signMessages` is bridged from the
+ * wallet's `modifyAndSignMessages` (drop the unused modified content).
  */
 export function useWidgetSigner(
   account: UiWalletAccount,
   chain: `solana:${string}`
 ): WidgetSigner {
-  const txSigner = useWalletAccountTransactionSendingSigner(account, chain)
+  const signTxSigner = useWalletAccountTransactionSigner(account, chain)
+  const sendingSigner = useWalletAccountTransactionSendingSigner(account, chain)
   const msgSigner = useWalletAccountMessageSigner(account)
 
   return useMemo<WidgetSigner>(
     () => ({
-      address: txSigner.address,
-      signAndSendTransactions: txSigner.signAndSendTransactions,
+      address: signTxSigner.address,
+      modifyAndSignTransactions: signTxSigner.modifyAndSignTransactions,
+      signAndSendTransactions: sendingSigner.signAndSendTransactions,
       signMessages: async (messages) => {
         const signed = await msgSigner.modifyAndSignMessages(messages)
         return signed.map((m) => m.signatures)
       }
     }),
-    [txSigner, msgSigner]
+    [signTxSigner, sendingSigner, msgSigner]
   )
 }

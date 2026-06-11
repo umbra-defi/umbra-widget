@@ -13,10 +13,12 @@ export function useClaimableUtxos(): {
 } {
   const { services } = useWidgetContext()
   const scan = useQuery(services.utxo.unclaimedUtxos(TREE_INDEX))
-  const utxos = useMemo(
-    () => (scan.data ? claimableResultToUtxos(TREE_INDEX, scan.data) : []),
-    [scan.data]
-  )
+  const utxos = useMemo(() => {
+    if (!scan.data) return []
+    return claimableResultToUtxos(TREE_INDEX, scan.data).sort(
+      (a, b) => b.timestamp.getTime() - a.timestamp.getTime()
+    )
+  }, [scan.data])
   return {
     utxos,
     isLoading: scan.isLoading,

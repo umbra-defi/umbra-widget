@@ -1,20 +1,40 @@
+import type { WidgetEndpoints } from '@/types'
+
 /**
- * Service endpoints. Defaults target Umbra production; override at build time
- * via Vite env vars when embedding against a different deployment.
+ * Fully-resolved endpoint set the services consume. Build-time env vars provide
+ * the defaults; the `endpoints` prop overrides per-instance at runtime.
  */
+export interface ResolvedEndpoints {
+  indexer: string
+  nullifierIndexer: string
+  relayer: string
+  zkCdnUrl: string
+  zkManifestUrl: string
+}
+
 const env =
   (import.meta as { env?: Record<string, string | undefined> }).env ?? {}
 
-export const RELAYER_ENDPOINT =
-  env.VITE_UMBRA_RELAYER_URL ?? 'https://relayer.api.umbraprivacy.com'
+const ZK_CDN = env.VITE_ZK_CDN_URL ?? 'https://zk.api.umbraprivacy.com'
 
-export const NULLIFIER_INDEXER_ENDPOINT =
-  env.VITE_NULLIFIER_INDEXER_URL ??
-  'https://nullifier-indexer.api.umbraprivacy.com'
+export const DEFAULT_ENDPOINTS: ResolvedEndpoints = {
+  indexer: env.VITE_INDEXER_URL ?? 'https://utxo-indexer.api.umbraprivacy.com',
+  nullifierIndexer:
+    env.VITE_NULLIFIER_INDEXER_URL ??
+    'https://nullifier-indexer.api.umbraprivacy.com',
+  relayer: env.VITE_UMBRA_RELAYER_URL ?? 'https://relayer.api.umbraprivacy.com',
+  zkCdnUrl: ZK_CDN,
+  zkManifestUrl: `${ZK_CDN}/v5/manifest.json`
+}
 
-export const INDEXER_ENDPOINT =
-  env.VITE_INDEXER_URL ?? 'https://utxo-indexer.api.umbraprivacy.com'
-
-export const ZK_CDN_BASE_URL =
-  env.VITE_ZK_CDN_URL ?? 'https://zk.api.umbraprivacy.com'
-export const ZK_CDN_MANIFEST_URL = `${ZK_CDN_BASE_URL}/v5/manifest.json`
+/** Merge the `endpoints` prop over the defaults. */
+export function resolveEndpoints(e?: WidgetEndpoints): ResolvedEndpoints {
+  const zkCdnUrl = e?.zkCdnUrl ?? DEFAULT_ENDPOINTS.zkCdnUrl
+  return {
+    indexer: e?.indexer ?? DEFAULT_ENDPOINTS.indexer,
+    nullifierIndexer: e?.nullifierIndexer ?? DEFAULT_ENDPOINTS.nullifierIndexer,
+    relayer: e?.relayer ?? DEFAULT_ENDPOINTS.relayer,
+    zkCdnUrl,
+    zkManifestUrl: e?.zkManifestUrl ?? `${zkCdnUrl}/v5/manifest.json`
+  }
+}

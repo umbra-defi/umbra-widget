@@ -1,5 +1,19 @@
-import type { SecureKeyValueStore } from '@umbra-privacy/client/ports'
+import type {
+  KeyValueStore,
+  SecureKeyValueStore
+} from '@umbra-privacy/client/ports'
 import type { WidgetStorage } from '@/types'
+
+/** Adapt a (possibly sync) WidgetStorage to the async `KeyValueStore` port. */
+export function toKeyValueStore(kv: WidgetStorage): KeyValueStore {
+  return {
+    getItem: (key) => Promise.resolve(kv.getItem(key)),
+    setItem: (key, value) =>
+      Promise.resolve(kv.setItem(key, value)).then(() => undefined),
+    removeItem: (key) =>
+      Promise.resolve(kv.removeItem(key)).then(() => undefined)
+  }
+}
 
 /**
  * Byte-oriented persistence the SDK's sharded utxo/nullifier stores consume.
@@ -36,11 +50,19 @@ export function prefixedStore(
  */
 export function toSecureStorage(kv: WidgetStorage): SecureKeyValueStore {
   return {
-    getItem: (key) => Promise.resolve(kv.getItem(key)),
-    setItem: (key, value) =>
-      Promise.resolve(kv.setItem(key, value)).then(() => undefined),
-    removeItem: (key) =>
-      Promise.resolve(kv.removeItem(key)).then(() => undefined)
+    getItem: async (key) => {
+      const v = await Promise.resolve(kv.getItem(key))
+      console.log('[uw secure] GET', key, v == null ? 'MISS' : `HIT(${v.length})`)
+      return v
+    },
+    setItem: (key, value) => {
+      console.log('[uw secure] SET', key, `len=${value.length}`)
+      return Promise.resolve(kv.setItem(key, value)).then(() => undefined)
+    },
+    removeItem: (key) => {
+      console.log('[uw secure] REMOVE', key)
+      return Promise.resolve(kv.removeItem(key)).then(() => undefined)
+    }
   }
 }
 

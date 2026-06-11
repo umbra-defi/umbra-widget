@@ -10,39 +10,43 @@ import {
   createZkAssetStore
 } from '@umbra-privacy/client-platform/web'
 import { proveInWorker } from '@/workers/zk-proof-worker-client'
-import {
-  RELAYER_ENDPOINT,
-  ZK_CDN_BASE_URL,
-  ZK_CDN_MANIFEST_URL
-} from '@/constants/endpoints'
 
-const zkProver = createSnarkjsZkProver({ proveFn: proveInWorker })
-const zkAssets = createZkAssetStore({
-  cdnBaseUrl: ZK_CDN_BASE_URL,
-  manifestUrl: ZK_CDN_MANIFEST_URL
-})
-
-const zkDeps = { zkProver, zkAssets }
-
-export const utxoZkOps = {
-  createCreateUtxoEphemeralProver: () =>
-    createCreateUtxoWithEphemeralUnlockerZkProver(zkDeps),
-  createCreateUtxoReceiverProver: () =>
-    createCreateUtxoWithReceiverUnlockerZkProver(zkDeps),
-  createClaimEphemeralProver: () => createClaimEphemeralZkProver(zkDeps),
-  createClaimReceiverProver: () => createClaimReceiverZkProver(zkDeps)
+export interface PlatformEndpoints {
+  relayer: string
+  zkCdnUrl: string
+  zkManifestUrl: string
 }
 
-export const getRegistrationProver = async () => {
-  const { createUserRegistrationProver } =
-    await import('@umbra-privacy/client/zk')
-  return createUserRegistrationProver(zkDeps)
-}
+/**
+ * Per-widget platform wiring built from the resolved endpoints: the
+ * worker-backed ZK prover + asset store, the bound utxo prover factories, the
+ * registration prover, and the relayer. Endpoint-driven so hosts can point at
+ * any deployment.
+ */
+export function createPlatform(endpoints: PlatformEndpoints) {
+  const zkProver = createSnarkjsZkProver({ proveFn: proveInWorker })
+  const zkAssets = createZkAssetStore({
+    cdnBaseUrl: endpoints.zkCdnUrl,
+    manifestUrl: endpoints.zkManifestUrl
+  })
+  const zkDeps = { zkProver, zkAssets }
 
-let relayer: ReturnType<typeof getUmbraRelayer> | null = null
-export function getRelayer() {
-  if (!relayer) {
-    relayer = getUmbraRelayer({ apiEndpoint: RELAYER_ENDPOINT })
+  const utxoZkOps = {
+    createCreateUtxoEphemeralProver: () =>
+      createCreateUtxoWithEphemeralUnlockerZkProver(zkDeps),
+    createCreateUtxoReceiverProver: () =>
+      createCreateUtxoWithReceiverUnlockerZkProver(zkDeps),
+    createClaimEphemeralProver: () => createClaimEphemeralZkProver(zkDeps),
+    createClaimReceiverProver: () => createClaimReceiverZkProver(zkDeps)
   }
-  return relayer
+
+  const getRegistrationProver = async () => {
+    const { createUserRegistrationProver } =
+      await import('@umbra-privacy/client/zk')
+    return createUserRegistrationProver(zkDeps)
+  }
+
+  const relayer = getUmbraRelayer({ apiEndpoint: endpoints.relayer })
+
+  return { utxoZkOps, getRegistrationProver, relayer }
 }

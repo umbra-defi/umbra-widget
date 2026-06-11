@@ -34,6 +34,7 @@ function useWidgetShell(props: UmbraWidgetProps) {
           network={props.network}
           mints={props.mints}
           storage={props.storage}
+          endpoints={props.endpoints}
           walletAddress={props.walletAddress}
         >
           <WidgetHeader />

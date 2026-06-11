@@ -12,7 +12,6 @@ import {
 import type { IUmbraClient } from '@umbra-privacy/client/sdk'
 import { useWidgetContext } from '@/providers/widget-context'
 import { useIsRegistered } from '@/features/registration/query'
-import { getRegistrationProver } from '@/client/platform'
 
 export const keyConsistencyQueryKeys = {
   verify: (address: string) =>
@@ -52,7 +51,7 @@ export function useKeyConsistencyQuery() {
 
 /** Restore on-chain key consistency (re-registers the inconsistent keys). */
 export function useRestoreKeyConsistencyMutation() {
-  const { runtimeDeps, walletAddress, mints } = useWidgetContext()
+  const { runtimeDeps, walletAddress, mints, services } = useWidgetContext()
   const queryClient = useQueryClient()
 
   return useMutation({
@@ -60,7 +59,7 @@ export function useRestoreKeyConsistencyMutation() {
     mutationFn: async () => {
       const client = runtimeDeps.getClient() as IUmbraClient | null
       if (!client) throw new Error('Umbra client not initialized')
-      const zkProver = await getRegistrationProver()
+      const zkProver = await services.getRegistrationProver()
       const restore = getRestoreKeyConsistencyFunction({ client }, { zkProver })
       return restore({
         additionalMints: mints.map((m) => toAddress(m.address)),

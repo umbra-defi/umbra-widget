@@ -15,7 +15,7 @@ overrides:
 importers:
 
   .:
-    dependencies:
+    devDependencies:
       '@noble/hashes':
         specifier: ^2.2.0
         version: 2.2.0
@@ -25,40 +25,21 @@ importers:
       '@radix-ui/react-tabs':
         specifier: ^1.1.3
         version: 1.1.14(@types/react-dom@18.3.7(@types/react@18.3.31))(@types/react@18.3.31)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@tanstack/query-async-storage-persister':
-        specifier: 5.100.10
-        version: 5.100.10
-      '@tanstack/react-query-persist-client':
-        specifier: 5.100.10
-        version: 5.100.10(@tanstack/react-query@5.100.10(react@18.3.1))(react@18.3.1)
-      class-variance-authority:
-        specifier: ^0.7.1
-        version: 0.7.1
-      clsx:
-        specifier: ^2.1.1
-        version: 2.1.1
-      motion:
-        specifier: ^12.40.0
-        version: 12.40.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      snarkjs:
-        specifier: ^0.7.5
-        version: 0.7.6
-      tailwind-merge:
-        specifier: ^2.6.0
-        version: 2.6.1
-      zustand:
-        specifier: ^5.0.0
-        version: 5.0.14(@types/react@18.3.31)(react@18.3.1)
-    devDependencies:
       '@solana/kit':
         specifier: ^6.4.0
         version: 6.9.0(bufferutil@4.1.0)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.9.3)(utf-8-validate@6.0.6)
       '@solana/react':
         specifier: 6.9.0
         version: 6.9.0(fastestsmallesttextencoderdecoder@1.0.22)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)
+      '@tanstack/query-async-storage-persister':
+        specifier: 5.100.10
+        version: 5.100.10
       '@tanstack/react-query':
         specifier: 5.100.10
         version: 5.100.10(react@18.3.1)
+      '@tanstack/react-query-persist-client':
+        specifier: 5.100.10
+        version: 5.100.10(@tanstack/react-query@5.100.10(react@18.3.1))(react@18.3.1)
       '@types/node':
         specifier: ^25.9.3
         version: 25.9.3
@@ -73,7 +54,7 @@ importers:
         version: file:tarballs/umbra-privacy-client-1.0.0.tgz(@solana/sysvars@6.9.0(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.9.3))(@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6))(@tanstack/react-query@5.100.10(react@18.3.1))(@umbra-privacy/sdk@5.0.0-rc.4(bufferutil@4.1.0)(fastestsmallesttextencoderdecoder@1.0.22)(snarkjs@0.7.6)(typescript@5.9.3)(utf-8-validate@6.0.6))(bufferutil@4.1.0)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.9.3)(utf-8-validate@6.0.6)(zustand@5.0.14(@types/react@18.3.31)(react@18.3.1))
       '@umbra-privacy/client-platform':
         specifier: file:./tarballs/umbra-privacy-client-platform-0.0.0.tgz
-        version: file:tarballs/umbra-privacy-client-platform-0.0.0.tgz(@keystonehq/keystone-sdk@0.11.7)(@umbra-privacy/client@file:tarballs/umbra-privacy-client-1.0.0.tgz(@solana/sysvars@6.9.0(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.9.3))(@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6))(@tanstack/react-query@5.100.10(react@18.3.1))(@umbra-privacy/sdk@5.0.0-rc.4(bufferutil@4.1.0)(fastestsmallesttextencoderdecoder@1.0.22)(snarkjs@0.7.6)(typescript@5.9.3)(utf-8-validate@6.0.6))(bufferutil@4.1.0)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.9.3)(utf-8-validate@6.0.6)(zustand@5.0.14(@types/react@18.3.31)(react@18.3.1)))(snarkjs@0.7.6)
+        version: file:tarballs/umbra-privacy-client-platform-0.0.0.tgz(@keystonehq/keystone-sdk@0.11.7)(@umbra-privacy/client@file:tarballs/umbra-privacy-client-1.0.0.tgz(@solana/sysvars@6.9.0(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.9.3))(@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6))(@tanstack/react-query@5.100.10(react@18.3.1))(@umbra-privacy/sdk@5.0.0-rc.4(bufferutil@4.1.0)(fastestsmallesttextencoderdecoder@1.0.22)(snarkjs@0.7.6)(typescript@5.9.3)(utf-8-validate@6.0.6))(bufferutil@4.1.0)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.9.3)(utf-8-validate@6.0.6)(zustand@5.0.14(@types/react@18.3.31)(react@18.3.1)))(@umbra-privacy/sdk@5.0.0-rc.4(bufferutil@4.1.0)(fastestsmallesttextencoderdecoder@1.0.22)(snarkjs@0.7.6)(typescript@5.9.3)(utf-8-validate@6.0.6))(snarkjs@0.7.6)
       '@umbra-privacy/sdk':
         specifier: 5.0.0-rc.4
         version: 5.0.0-rc.4(bufferutil@4.1.0)(fastestsmallesttextencoderdecoder@1.0.22)(snarkjs@0.7.6)(typescript@5.9.3)(utf-8-validate@6.0.6)
@@ -86,6 +67,15 @@ importers:
       autoprefixer:
         specifier: ^10.4.20
         version: 10.5.0(postcss@8.5.15)
+      class-variance-authority:
+        specifier: ^0.7.1
+        version: 0.7.1
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
+      motion:
+        specifier: ^12.40.0
+        version: 12.40.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       prettier:
         specifier: ^3.4.0
         version: 3.8.4
@@ -95,6 +85,12 @@ importers:
       react-dom:
         specifier: ^18.3.0
         version: 18.3.1(react@18.3.1)
+      snarkjs:
+        specifier: ^0.7.5
+        version: 0.7.6
+      tailwind-merge:
+        specifier: ^2.6.0
+        version: 2.6.1
       tailwindcss:
         specifier: ^3.4.17
         version: 3.4.19(yaml@2.9.0)
@@ -110,6 +106,12 @@ importers:
       vite-plugin-node-polyfills:
         specifier: ^0.28.0
         version: 0.28.0(rollup@4.61.1)(vite@6.4.3(@types/node@25.9.3)(jiti@1.21.7)(yaml@2.9.0))
+      vite-tsconfig-paths:
+        specifier: ^6.1.1
+        version: 6.1.1(typescript@5.9.3)(vite@6.4.3(@types/node@25.9.3)(jiti@1.21.7)(yaml@2.9.0))
+      zustand:
+        specifier: ^5.0.0
+        version: 5.0.14(@types/react@18.3.31)(react@18.3.1)
 
 packages:
 
@@ -1785,7 +1787,7 @@ packages:
     engines: {node: '>=18.0.0'}
 
   '@umbra-privacy/client-platform@file:tarballs/umbra-privacy-client-platform-0.0.0.tgz':
-    resolution: {integrity: sha512-PkMGVFFwslWiz+cKsZpuz4jwpjJ7hX2rZ7aOxL9cOcmoQXDspZriHqSybaL9FFdr9WJ2BBsZXGa8JsYbwXj4Zw==, tarball: file:tarballs/umbra-privacy-client-platform-0.0.0.tgz}
+    resolution: {integrity: sha512-s2QiW3CaxJ14f6cwaTYV+gn+6o5385xJuoXl0QVRpogzk9F3OTWwxJXZ2Pxa2YqpagqMsu4McRoNbjgiVXeXfg==, tarball: file:tarballs/umbra-privacy-client-platform-0.0.0.tgz}
     version: 0.0.0
     peerDependencies:
       '@keystonehq/keystone-sdk': '*'
@@ -1799,6 +1801,7 @@ packages:
       '@umbra-privacy/client': 1.0.0
       '@umbra-privacy/rn-quick-poseidon': '*'
       '@umbra-privacy/rn-zk-prover': '*'
+      '@umbra-privacy/sdk': 5.0.0-rc.4
       expo-apple-authentication: '*'
       expo-asset: '*'
       expo-camera: '*'
@@ -1906,7 +1909,7 @@ packages:
         optional: true
 
   '@umbra-privacy/client@file:tarballs/umbra-privacy-client-1.0.0.tgz':
-    resolution: {integrity: sha512-h9tP4zm6UgvwpfEpwMPvIAExGudIjpPr2QztvsMFg0BXp1WAa9UtOIJVc8+sskRnUV2V5sDQEsjY4rpkbQTggA==, tarball: file:tarballs/umbra-privacy-client-1.0.0.tgz}
+    resolution: {integrity: sha512-HqE8XgI7EHSDK675SK2Z6X4HrP/js25w3HRlKeaV8HdF9GiTA9BU2n6HbQcx2e+sy95TSwqCNHuD0eGfLP00Xw==, tarball: file:tarballs/umbra-privacy-client-1.0.0.tgz}
     version: 1.0.0
     peerDependencies:
       '@tanstack/react-query': 5.100.10
@@ -2630,6 +2633,9 @@ packages:
   glob-parent@6.0.2:
     resolution: {integrity: sha512-XxwI8EOhVQgWp6iDL+3b0r86f4d6AX6zSU55HfB4ydCEuXLXc5FcYeOu+nnGftS4TEju/11rt4KJPTMgbfmv4A==}
     engines: {node: '>=10.13.0'}
+
+  globrex@0.1.2:
+    resolution: {integrity: sha512-uHJgbwAMwNFf5mLst7IWLNg14x1CkeqglJb/K3doi4dw6q2IvAAmM/Y81kevy83wP+Sst+nutFTYOGg3d1lsxg==}
 
   gopd@1.2.0:
     resolution: {integrity: sha512-ZUKRh6/kUFoAiTAtTYPZJ3hw9wNxx+BIBOijnlG9PnrJsCcSjs1wyyD6vJpaYtgnzDrKYRSqf3OO6Rfa93xsRg==}
@@ -3429,6 +3435,16 @@ packages:
   ts-interface-checker@0.1.13:
     resolution: {integrity: sha512-Y/arvbn+rrz3JCKl9C4kVNfTfSm2/mEp5FSz5EsZSANGPSlQrpRI5M4PKF+mJnE52jOO90PnPSc3Ur3bTQw0gA==}
 
+  tsconfck@3.1.6:
+    resolution: {integrity: sha512-ks6Vjr/jEw0P1gmOVwutM3B7fWxoWBL2KRDb1JfqGVawBmO5UsvmWOQFGHBPl5yxYz4eERr19E6L7NMv+Fej4w==}
+    engines: {node: ^18 || >=20}
+    hasBin: true
+    peerDependencies:
+      typescript: ^5.0.0
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
   tslib@1.14.1:
     resolution: {integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==}
 
@@ -3547,6 +3563,11 @@ packages:
     resolution: {integrity: sha512-NXct/ci2ef4fRyCfTb8fk2HmR80Rv7icLd+cRH41TnUugDzdKMFKqFPpZYCFUInZMMem9bkLv5pkq02+7Xu7+w==}
     peerDependencies:
       vite: ^2.0.0 || ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0
+
+  vite-tsconfig-paths@6.1.1:
+    resolution: {integrity: sha512-2cihq7zliibCCZ8P9cKJrQBkfgdvcFkOOc3Y02o3GWUDLgqjWsZudaoiuOwO/gzTzy17cS5F7ZPo4bsnS4DGkg==}
+    peerDependencies:
+      vite: '*'
 
   vite@6.4.3:
     resolution: {integrity: sha512-NTKlcQjlAK7MlQoyb6LgaqHc8sso/pVyUJYWMws3jg21uTJw/LddqIFPcPqP6PzpgbIcZyKI85sFE4HBrQDA8A==}
@@ -5625,9 +5646,10 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@umbra-privacy/client-platform@file:tarballs/umbra-privacy-client-platform-0.0.0.tgz(@keystonehq/keystone-sdk@0.11.7)(@umbra-privacy/client@file:tarballs/umbra-privacy-client-1.0.0.tgz(@solana/sysvars@6.9.0(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.9.3))(@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6))(@tanstack/react-query@5.100.10(react@18.3.1))(@umbra-privacy/sdk@5.0.0-rc.4(bufferutil@4.1.0)(fastestsmallesttextencoderdecoder@1.0.22)(snarkjs@0.7.6)(typescript@5.9.3)(utf-8-validate@6.0.6))(bufferutil@4.1.0)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.9.3)(utf-8-validate@6.0.6)(zustand@5.0.14(@types/react@18.3.31)(react@18.3.1)))(snarkjs@0.7.6)':
+  '@umbra-privacy/client-platform@file:tarballs/umbra-privacy-client-platform-0.0.0.tgz(@keystonehq/keystone-sdk@0.11.7)(@umbra-privacy/client@file:tarballs/umbra-privacy-client-1.0.0.tgz(@solana/sysvars@6.9.0(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.9.3))(@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6))(@tanstack/react-query@5.100.10(react@18.3.1))(@umbra-privacy/sdk@5.0.0-rc.4(bufferutil@4.1.0)(fastestsmallesttextencoderdecoder@1.0.22)(snarkjs@0.7.6)(typescript@5.9.3)(utf-8-validate@6.0.6))(bufferutil@4.1.0)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.9.3)(utf-8-validate@6.0.6)(zustand@5.0.14(@types/react@18.3.31)(react@18.3.1)))(@umbra-privacy/sdk@5.0.0-rc.4(bufferutil@4.1.0)(fastestsmallesttextencoderdecoder@1.0.22)(snarkjs@0.7.6)(typescript@5.9.3)(utf-8-validate@6.0.6))(snarkjs@0.7.6)':
     dependencies:
       '@umbra-privacy/client': file:tarballs/umbra-privacy-client-1.0.0.tgz(@solana/sysvars@6.9.0(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.9.3))(@solana/web3.js@1.98.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@6.0.6))(@tanstack/react-query@5.100.10(react@18.3.1))(@umbra-privacy/sdk@5.0.0-rc.4(bufferutil@4.1.0)(fastestsmallesttextencoderdecoder@1.0.22)(snarkjs@0.7.6)(typescript@5.9.3)(utf-8-validate@6.0.6))(bufferutil@4.1.0)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.9.3)(utf-8-validate@6.0.6)(zustand@5.0.14(@types/react@18.3.31)(react@18.3.1))
+      '@umbra-privacy/sdk': 5.0.0-rc.4(bufferutil@4.1.0)(fastestsmallesttextencoderdecoder@1.0.22)(snarkjs@0.7.6)(typescript@5.9.3)(utf-8-validate@6.0.6)
     optionalDependencies:
       '@keystonehq/keystone-sdk': 0.11.7
       snarkjs: 0.7.6
@@ -6500,6 +6522,8 @@ snapshots:
   glob-parent@6.0.2:
     dependencies:
       is-glob: 4.0.3
+
+  globrex@0.1.2: {}
 
   gopd@1.2.0: {}
 
@@ -7384,6 +7408,10 @@ snapshots:
 
   ts-interface-checker@0.1.13: {}
 
+  tsconfck@3.1.6(typescript@5.9.3):
+    optionalDependencies:
+      typescript: 5.9.3
+
   tslib@1.14.1: {}
 
   tslib@2.8.1: {}
@@ -7496,6 +7524,16 @@ snapshots:
       vite: 6.4.3(@types/node@25.9.3)(jiti@1.21.7)(yaml@2.9.0)
     transitivePeerDependencies:
       - rollup
+
+  vite-tsconfig-paths@6.1.1(typescript@5.9.3)(vite@6.4.3(@types/node@25.9.3)(jiti@1.21.7)(yaml@2.9.0)):
+    dependencies:
+      debug: 4.4.3
+      globrex: 0.1.2
+      tsconfck: 3.1.6(typescript@5.9.3)
+      vite: 6.4.3(@types/node@25.9.3)(jiti@1.21.7)(yaml@2.9.0)
+    transitivePeerDependencies:
+      - supports-color
+      - typescript
 
   vite@6.4.3(@types/node@25.9.3)(jiti@1.21.7)(yaml@2.9.0):
     dependencies:

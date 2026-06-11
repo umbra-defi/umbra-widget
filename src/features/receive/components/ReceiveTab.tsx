@@ -70,6 +70,12 @@ export function ReceiveTab() {
             const symbol = meta?.symbol ?? u.symbol
             const iconUrl = meta?.iconUrl ?? u.iconUrl
             const decimals = meta?.decimals ?? u.decimals
+            // Self-burnable = you created it for yourself → show destination;
+            // receiver-burnable = someone sent it to you → show sender.
+            const selfClaim = u.type.includes('self-burnable')
+            const peerLabel = selfClaim
+              ? `To ${truncate(String(u.destinationAddress))}`
+              : `From ${truncate(String(u.senderAddress))}`
             return (
               <div
                 key={u.id}
@@ -81,7 +87,7 @@ export function ReceiveTab() {
                     {fromBaseUnits(u.amount as bigint, decimals)} {symbol}
                   </span>
                   <span className='truncate text-xs text-uw-text-tertiary'>
-                    From {truncate(String(u.senderAddress))}
+                    {peerLabel}
                   </span>
                 </div>
                 <Button

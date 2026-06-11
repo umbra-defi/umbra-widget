@@ -5,7 +5,11 @@ import {
 import { getTokenProgramAddressFromChain } from '@umbra-privacy/client/send'
 import { createSolanaService } from '@umbra-privacy/client/solana'
 import { createTokenService, tokenQueries } from '@umbra-privacy/client/token'
-import { createUtxoService, utxoQueries } from '@umbra-privacy/client/utxo'
+import {
+  createUtxoService,
+  utxoQueries,
+  type ClaimSyncStore
+} from '@umbra-privacy/client/utxo'
 import { address as toAddress, type Address } from '@solana/kit'
 import {
   createSdkService,
@@ -17,12 +21,9 @@ import type { SecureKeyValueStore } from '@umbra-privacy/client/ports'
 import type { RuntimeDepsHandle } from './runtime-deps'
 import type { SignerResolver } from './signer'
 import type { StorageBackend } from './storage'
-import { utxoZkOps, getRegistrationProver, getRelayer } from './platform'
+import { createPlatform } from './platform'
 import { legacyMasterSeedScheme } from './legacy-master-seed'
-import {
-  INDEXER_ENDPOINT,
-  NULLIFIER_INDEXER_ENDPOINT
-} from '@/constants/endpoints'
+import type { ResolvedEndpoints } from '@/constants/endpoints'
 
 /** Bump to invalidate cached seed/registration entries under a new scheme. */
 const STORAGE_VERSION = 'widget-v1'
@@ -35,8 +36,12 @@ export interface BuildServicesDeps {
   signerResolver: SignerResolver
   secureStorage: SecureKeyValueStore
   storageBackend: StorageBackend
+  /** Persistent claim-status/cursor cache for the utxo scan. */
+  claimSyncStore: ClaimSyncStore
   /** Supported mint addresses — drives the token-metadata batch fetch. */
   mintAddresses: string[]
+  /** Resolved service endpoints. */
+  endpoints: ResolvedEndpoints
 }
 
 export type WidgetServices = ReturnType<typeof buildServices>
@@ -52,17 +57,25 @@ export function buildServices(deps: BuildServicesDeps) {
     signerResolver,
     secureStorage,
     storageBackend,
-    mintAddresses
+    claimSyncStore,
+    mintAddresses,
+    endpoints
   } = deps
+
+  const platform = createPlatform(endpoints)
 
   const sdkService = createSdkService({
     ctx,
-    getRegistrationProver,
+    getRegistrationProver: platform.getRegistrationProver,
     secureStorage,
-    indexerEndpoint: INDEXER_ENDPOINT,
+    indexerEndpoint: endpoints.indexer,
     storageVersion: STORAGE_VERSION,
     storageBackend,
-    legacyMasterSeedSchemes: [legacyMasterSeedScheme]
+    legacyMasterSeedSchemes: [legacyMasterSeedScheme],
+    // Sign current + legacy scheme messages once at client init (get-started)
+    // and cache both seeds — otherwise the legacy seed is derived lazily on the
+    // first UTXO scan, re-prompting a signature when the Receive tab opens.
+    signSchemeMessages: 'eager'
   })
 
   const shielding = shieldingQueries(createShieldingService({ ctx }), {
@@ -74,10 +87,13 @@ export function buildServices(deps: BuildServicesDeps) {
 
   const utxoService = createUtxoService({
     getClient: ctx.getClient,
-    zkOps: utxoZkOps,
-    relayer: getRelayer(),
+    zkOps: platform.utxoZkOps,
+    relayer: platform.relayer,
     sdk: { isReceiverRegistered, decodeSolanaErrorMessage },
-    nullifierIndexerEndpoint: NULLIFIER_INDEXER_ENDPOINT
+    nullifierIndexerEndpoint: endpoints.nullifierIndexer,
+    // Persistent claim-status/cursor cache so claimed-detection doesn't
+    // re-derive hashes + refetch burnt nullifiers from 0 each scan.
+    claimSyncStore
     // aesDecryptor omitted — SDK falls back to WebCrypto. Wire the AES worker
     // here (cast to AesDecryptorFunction) to move bulk decrypt off-thread.
   })
@@ -102,7 +118,14 @@ export function buildServices(deps: BuildServicesDeps) {
   })
   const token = tokenQueries(tokenService)
 
-  return { sdkService, shielding, utxo, token }
+  return {
+    sdkService,
+    shielding,
+    utxo,
+    token,
+    /** ZK registration prover (also used by key-consistency restore). */
+    getRegistrationProver: platform.getRegistrationProver
+  }
 }
 
 export { isReceiverRegistered, isRegisteredOnChain }

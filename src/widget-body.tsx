@@ -37,7 +37,9 @@ const EASE = [0.22, 1, 0.36, 1] as const
  */
 export function WidgetBody({ tabs }: { tabs: WidgetTab[] }) {
   const { isRegistered, isChecking } = useRegistration()
-  useEnsureUmbraClient(isRegistered)
+  // Registered → init the SDK client (derives/loads seed). Until it's ready,
+  // show only the app icon.
+  const { isSuccess: clientReady } = useEnsureUmbraClient(isRegistered)
   const [active, setActive] = useState<WidgetTab>(tabs[0] ?? 'home')
 
   // Keep the splash up for at least 2s so it doesn't flash on fast loads.
@@ -50,7 +52,10 @@ export function WidgetBody({ tabs }: { tabs: WidgetTab[] }) {
   let content: ReactNode
   let bodyKey: string
 
-  if (isChecking || !minElapsed) {
+  // Registered but client still initializing → keep showing the icon.
+  const clientInitializing = isRegistered && !clientReady
+
+  if (isChecking || !minElapsed || clientInitializing) {
     bodyKey = 'loading'
     content = (
       <div className='flex items-center justify-center p-32'>
@@ -70,9 +75,11 @@ export function WidgetBody({ tabs }: { tabs: WidgetTab[] }) {
     content = <View />
   }
 
+  const showTabs = isRegistered && clientReady && !isChecking && minElapsed
+
   return (
     <motion.div layout transition={{ layout: { duration: 0.3, ease: EASE } }}>
-      {isRegistered && !isChecking && minElapsed && (
+      {showTabs && (
         <Tabs
           value={active}
           onValueChange={(v) => setActive(v as WidgetTab)}

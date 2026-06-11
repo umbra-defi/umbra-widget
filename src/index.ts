@@ -7,5 +7,6 @@ export type {
   WidgetTab,
   WidgetUiConfig,
   WidgetStorage,
-  WidgetNetwork
+  WidgetNetwork,
+  WidgetEndpoints
 } from '@/types'

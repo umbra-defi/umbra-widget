@@ -59,6 +59,19 @@ export function useHome() {
     [mints, metadataMap, byMint, balanceLoading]
   )
 
+  // Total private balance across supported tokens (USD).
+  const totalUsd = useMemo(
+    () => formatUsdValue(tokens.reduce((sum, t) => sum + (t.value ?? 0), 0)),
+    [tokens]
+  )
+
   // First-ever load (no cached metadata): render full skeleton rows.
-  return { rows, isLoading, isFetching, metaLoading }
+  return {
+    rows,
+    isLoading,
+    isFetching,
+    metaLoading,
+    totalUsd,
+    totalLoading: balanceLoading
+  }
 }

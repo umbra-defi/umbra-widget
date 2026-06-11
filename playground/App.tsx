@@ -1,4 +1,4 @@
-import { UmbraWidget } from '@/index'
+import { UmbraWidgetInline } from '@/index'
 import { useState } from 'react'
 import type { UiWallet, UiWalletAccount } from '@wallet-standard/react'
 import {
@@ -159,6 +159,13 @@ export function App() {
           ))}
         </section>
 
+        {connected && (
+          <WidgetMount
+            account={connected.account}
+            open={open}
+            onOpenChange={setOpen}
+          />
+        )}
         <p
           style={{
             color: '#9aa1ad',
@@ -199,14 +206,6 @@ export function App() {
           or press Esc to close it.
         </p>
       </main>
-
-      {connected && (
-        <WidgetMount
-          account={connected.account}
-          open={open}
-          onOpenChange={setOpen}
-        />
-      )}
     </div>
   )
 }
@@ -223,7 +222,7 @@ function WidgetMount({
 }) {
   const signer = useWidgetSigner(account, SOLANA_MAINNET)
   return (
-    <UmbraWidget
+    <UmbraWidgetInline
       signer={signer}
       rpcUrl={RPC_URL}
       network='mainnet'

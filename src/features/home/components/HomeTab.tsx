@@ -3,9 +3,20 @@ import { Skeleton } from '@/ui/skeleton'
 import { useHome } from '../hooks/use-home'
 
 export function HomeTab() {
-  const { rows, metaLoading } = useHome()
+  const { rows, metaLoading, totalUsd, totalLoading } = useHome()
   return (
     <div className='flex flex-col'>
+      <div className='mb-4 flex flex-col  gap-1 px-2 py-2'>
+        <span className='text-[11px] font-semibold tracking-wider text-uw-text-tertiary'>
+          Private Balance
+        </span>
+        {totalLoading ? (
+          <Skeleton className='h-8 w-32' />
+        ) : (
+          <span className='text-4xl font-bold text-uw-text'>{totalUsd}</span>
+        )}
+      </div>
+
       <div className='flex items-center justify-between px-2 pb-1'>
         <span className='text-[11px] font-semibold uppercase tracking-wider text-uw-text-tertiary'>
           Asset

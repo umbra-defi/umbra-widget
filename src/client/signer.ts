@@ -13,8 +13,16 @@ const b58 = getBase58Decoder()
 type SignatureDictionary = Record<string, Uint8Array>
 
 type SignOnly = {
-  // kit's TransactionPartialSigner: returns SIGNATURE DICTIONARIES, not signed
-  // transactions. The signed tx is the original + these signatures merged in.
+  // kit TransactionModifyingSigner (wallet-standard `solana:signTransaction`):
+  // returns a fully SIGNED transaction. This is the primary path for wallet
+  // adapters — they sign and hand the tx back without broadcasting.
+  modifyAndSignTransactions?: (
+    txs: readonly Transaction[],
+    config?: unknown
+  ) => Promise<readonly Transaction[]>
+  // kit TransactionPartialSigner (e.g. a KeyPairSigner): returns SIGNATURE
+  // DICTIONARIES, not signed transactions. The signed tx is the original + these
+  // signatures merged in.
   signTransactions?: (
     txs: readonly Transaction[]
   ) => Promise<readonly SignatureDictionary[]>
@@ -23,27 +31,41 @@ type SignOnly = {
   ) => Promise<Uint8Array[]>
 }
 
-/** Partial-sign a tx with a kit signer → a signed Transaction (keeps
- *  `messageBytes`, merges signatures). */
-async function partialSign(
+/** Sign a tx with a kit signer → a SIGNED Transaction (does NOT broadcast).
+ *  The Umbra deposit/withdraw pipeline needs the signed bytes to submit itself,
+ *  so this must return the signed transaction, not a tx signature. */
+async function signTx(
   s: SignOnly,
   transaction: Transaction
 ): Promise<Transaction> {
-  if (!s.signTransactions) throw new Error('signer cannot sign transactions')
-  const [sigs] = await s.signTransactions([transaction])
-  return {
-    ...transaction,
-    signatures: { ...transaction.signatures, ...sigs }
-  } as Transaction
+  // Modifying signer → already-signed transaction.
+  if (typeof s.modifyAndSignTransactions === 'function') {
+    const [signed] = await s.modifyAndSignTransactions([transaction])
+    if (!signed) throw new Error('signer returned no signed transaction')
+    return signed as Transaction
+  }
+  // Partial signer → merge returned signature dict into the tx.
+  if (typeof s.signTransactions === 'function') {
+    const [sigs] = await s.signTransactions([transaction])
+    return {
+      ...transaction,
+      signatures: { ...transaction.signatures, ...sigs }
+    } as Transaction
+  }
+  throw new Error(
+    'signer cannot sign transactions: needs a TransactionPartialSigner ' +
+      '(signTransactions) or TransactionModifyingSigner (modifyAndSignTransactions). ' +
+      'A send-only wallet (signAndSendTransactions) cannot return signed tx bytes.'
+  )
 }
 
 /**
  * Adapt a `@solana/kit` signer to the client's `WalletSigner` port.
  *
- * Sending: a wallet-standard signer exposes `signAndSendTransactions` (it owns
- * the RPC). A bare keypair signer does NOT — it can only sign — so we sign with
- * `signTransactions` and submit through the widget's own `rpc`. This is why the
- * adapter needs an `rpc`.
+ * `signTransaction` returns a SIGNED (not sent) tx — the Umbra pipeline submits
+ * it itself. For sending: a wallet that owns the RPC exposes
+ * `signAndSendTransactions` (fast path); otherwise we sign and submit through
+ * the widget's own `rpc` (why the adapter needs it).
  */
 export function makeWalletSigner(
   signer: WidgetSigner,
@@ -53,6 +75,11 @@ export function makeWalletSigner(
 
   return {
     signMessage: async (message) => {
+      console.log(
+        '[uw signer] signMessage called — msg:',
+        new TextDecoder().decode(message).slice(0, 120)
+      )
+      console.trace('[uw signer] signMessage caller')
       const [dict] = await signer.signMessages([
         { content: message, signatures: {} } as never
       ])
@@ -60,15 +87,15 @@ export function makeWalletSigner(
       if (!sig) throw new Error('signer returned no signature for its address')
       return b58.decode(sig)
     },
-    signTransaction: (transaction) => partialSign(s, transaction),
+    signTransaction: (transaction) => signTx(s, transaction),
     signAndSendTransaction: async (transaction) => {
-      // Wallet signer that can send itself.
+      // Wallet that owns the RPC: let it sign + broadcast.
       if (typeof s.signAndSendTransactions === 'function') {
         const [sig] = await s.signAndSendTransactions([transaction])
         return b58.decode(sig)
       }
-      // Sign-only signer (e.g. a keypair): sign, then submit via the RPC.
-      const signed = await partialSign(s, transaction)
+      // Otherwise sign, then submit via the widget's RPC.
+      const signed = await signTx(s, transaction)
       const wire = getBase64EncodedWireTransaction(signed)
       return rpc.sendTransaction(wire, { encoding: 'base64' }).send()
     }

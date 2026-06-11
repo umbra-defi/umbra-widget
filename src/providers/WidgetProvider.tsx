@@ -10,9 +10,13 @@ import { makeSignerResolver, makeWalletSigner } from '@/client/signer'
 import {
   prefixedStore,
   toSecureStorage,
-  toStorageBackend
+  toStorageBackend,
+  toKeyValueStore
 } from '@/client/storage'
+import { createIndexedDbStorage } from '@/client/idb-storage'
+import { createClaimSyncStore } from '@umbra-privacy/client/utxo'
 import { buildServices } from '@/client/services'
+import { resolveEndpoints } from '@/constants/endpoints'
 import { createWidgetQueryClient } from './query-client'
 import { useMintMetadataMap } from '@/features/token/hooks/use-tokens'
 import { WidgetContext, type WidgetContextValue } from './widget-context'
@@ -38,8 +42,10 @@ function makePersister() {
   })
 }
 
-// Dev default. Hosts should pass a real IndexedDB-backed store.
-const browserStorage: WidgetStorage = {
+// Default persistence: IndexedDB (survives reloads, holds the sharded UTXO /
+// nullifier data + claim-sync cache). Hosts can override via the `storage` prop.
+// Falls back to a localStorage shim where IndexedDB is unavailable (SSR/tests).
+const localStorageShim: WidgetStorage = {
   getItem: (k) =>
     typeof localStorage === 'undefined' ? null : localStorage.getItem(k),
   setItem: (k, v) => {
@@ -50,9 +56,18 @@ const browserStorage: WidgetStorage = {
   }
 }
 
+const defaultStorage: WidgetStorage =
+  typeof indexedDB !== 'undefined' ? createIndexedDbStorage() : localStorageShim
+
 type Props = Pick<
   UmbraWidgetProps,
-  'signer' | 'rpcUrl' | 'network' | 'mints' | 'storage' | 'walletAddress'
+  | 'signer'
+  | 'rpcUrl'
+  | 'network'
+  | 'mints'
+  | 'storage'
+  | 'endpoints'
+  | 'walletAddress'
 > & { children: ReactNode }
 
 /**
@@ -65,6 +80,7 @@ export function WidgetProvider({
   network,
   mints,
   storage,
+  endpoints,
   walletAddress,
   children
 }: Props) {
@@ -72,10 +88,11 @@ export function WidgetProvider({
   const [persister] = useState(makePersister)
 
   const value = useMemo<WidgetContextValue>(() => {
+    console.log('[uw provider] REBUILD services (signer/deps changed)')
     const resolvedNetwork =
       network ?? (rpcUrl.includes('mainnet') ? 'mainnet' : 'devnet')
     const address = String(walletAddress ?? signer.address)
-    const kv = storage ?? browserStorage
+    const kv = storage ?? defaultStorage
 
     const rpc = createSolanaRpc(rpcUrl) as Rpc<SolanaRpcApi>
     const walletSigner = makeWalletSigner(signer, rpc)
@@ -92,7 +109,11 @@ export function WidgetProvider({
       signerResolver: makeSignerResolver(signer, rpc),
       secureStorage: toSecureStorage(prefixedStore(kv, 'umbra:secure:')),
       storageBackend: toStorageBackend(prefixedStore(kv, 'umbra:sdk:')),
-      mintAddresses: resolvedMints.map((m) => m.address)
+      claimSyncStore: createClaimSyncStore(
+        toKeyValueStore(prefixedStore(kv, 'umbra:claim-sync:'))
+      ),
+      mintAddresses: resolvedMints.map((m) => m.address),
+      endpoints: resolveEndpoints(endpoints)
     })
 
     return {
@@ -105,7 +126,7 @@ export function WidgetProvider({
       walletSigner,
       services
     }
-  }, [signer, rpcUrl, network, mints, storage, walletAddress])
+  }, [signer, rpcUrl, network, mints, storage, endpoints, walletAddress])
 
   const tree = (
     <WidgetContext.Provider value={value}>
