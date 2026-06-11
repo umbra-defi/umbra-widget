@@ -1,0 +1,53 @@
+# @umbra-privacy/widget
+
+> Embeddable Umbra privacy wallet as one React component: shield (public→private), private send, unshield (private→public), receive/claim, and a private-balance home. One-time on-chain registration. `@umbra-privacy/client` is bundled in (self-contained); ZK proving runs in a Web Worker. Browser-only (Web Worker + WebCrypto + IndexedDB).
+
+## Install & mount
+
+```bash
+npm i @umbra-privacy/widget
+```
+```tsx
+import { UmbraWidget } from '@umbra-privacy/widget'
+import '@umbra-privacy/widget/styles.css'   // required
+<UmbraWidget signer={signer} rpcUrl="https://your-rpc" trigger={<button>Go Private</button>} />
+```
+
+Peer deps the host provides (not bundled): `react>=18`, `react-dom>=18`, `@solana/kit>=6`, `@tanstack/react-query>=5`, `@umbra-privacy/sdk@5.0.0-rc.4`.
+
+Exports: `UmbraWidget`, `UmbraWidgetInline`, `DEFAULT_MINTS`. Types: `UmbraWidgetProps`, `WidgetSigner`, `WidgetMint`, `WidgetTab`, `WidgetUiConfig`, `WidgetStorage`, `WidgetNetwork`, `WidgetEndpoints`.
+
+## Render modes
+
+`UmbraWidget` renders a modal when `trigger` OR `open` is provided; otherwise renders inline (= `UmbraWidgetInline`).
+
+## Signer (most common failure point)
+
+`signer: WidgetSigner` = `MessagePartialSigner & (TransactionModifyingSigner | TransactionPartialSigner) & Partial<TransactionSendingSigner>`. Must (1) sign messages and (2) sign a transaction AND return it. A sign-and-send-only wallet (`TransactionSendingSigner` / `signAndSendTransactions` alone) is NOT sufficient — the deposit/withdraw pipeline submits the signed bytes itself. Wallet-standard adapter: build from `@solana/react` `useWalletAccountTransactionSigner` (modifyAndSignTransactions) + `useWalletAccountMessageSigner` (+ optional sending signer). A `KeyPairSigner` works directly.
+
+## Required host bundler setup
+
+1. Node globals: polyfill `Buffer`/`process`/`global` (Vite: `vite-plugin-node-polyfills`; webpack/Next: `ProvidePlugin` + `resolve.fallback`). Skipping → `Buffer is not defined`.
+2. Web Workers: ES-module worker spawned by the widget; keep `import.meta.url`/worker support enabled. No aliases needed — client/client-platform are pre-bundled.
+3. Next.js App Router: render client-side only — `dynamic(() => import(...).then(m => m.UmbraWidget), { ssr: false })` + `'use client'`. Turbopack ignores the `webpack` field.
+
+## Props
+
+`signer*` (WidgetSigner), `rpcUrl*` (string; WS derived https→wss), `network?` ('mainnet'|'devnet', inferred from rpcUrl), `mints?` (WidgetMint[], default DEFAULT_MINTS), `tabs?` (WidgetTab[] = 'home'|'shield'|'transfer'|'unshield'|'receive', default all), `ui?` (WidgetUiConfig, partial theme → scoped CSS vars), `storage?` (WidgetStorage KV, default IndexedDB), `endpoints?` (WidgetEndpoints, default Umbra prod), `walletAddress?` (default signer.address), `open?`/`onOpenChange?`/`trigger?` (modal control), `className?` (inline only).
+
+## Defaults
+
+Endpoints: indexer `https://utxo-indexer.api.umbraprivacy.com`, nullifierIndexer `https://nullifier-indexer.api.umbraprivacy.com` (needs CORS for browsers — proxy if missing, else claimed UTXOs not filtered), relayer `https://relayer.api.umbraprivacy.com`, zkCdnUrl `https://zk.api.umbraprivacy.com`, zkManifestUrl `${zkCdnUrl}/v5/manifest.json`.
+Min public SOL (lamports): shield 13_000_000, unshield 13_000_000, transfer 20_000_000, register 13_000_000; claim relayer-funded (exempt). Below minimum → button reads "Not enough SOL".
+
+## Behavior
+
+Registration gate: on-chain check; unregistered users get a one-time sign-to-register screen, then SDK client auto-inits (app-icon-only until ready). Key-consistency check with a restore mutation on mismatch. Claimed-UTXO filtering via burnt-nullifier indexer + local hash derivation (IndexedDB-cached). Legacy seed scheme registered for old accounts.
+
+## Source pointers
+
+- src/types.ts — all public prop types
+- src/UmbraWidget.tsx — component (modal/inline logic)
+- src/constants/{mints,endpoints,sol-requirements}.ts — defaults
+- playground/wallet/use-widget-signer.ts — wallet-standard signer adapter
+- README.md — full guide, recipes, troubleshooting
