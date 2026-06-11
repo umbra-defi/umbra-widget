@@ -75,11 +75,6 @@ export function makeWalletSigner(
 
   return {
     signMessage: async (message) => {
-      console.log(
-        '[uw signer] signMessage called — msg:',
-        new TextDecoder().decode(message).slice(0, 120)
-      )
-      console.trace('[uw signer] signMessage caller')
       const [dict] = await signer.signMessages([
         { content: message, signatures: {} } as never
       ])

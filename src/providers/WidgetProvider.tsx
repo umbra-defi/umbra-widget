@@ -88,7 +88,6 @@ export function WidgetProvider({
   const [persister] = useState(makePersister)
 
   const value = useMemo<WidgetContextValue>(() => {
-    console.log('[uw provider] REBUILD services (signer/deps changed)')
     const resolvedNetwork =
       network ?? (rpcUrl.includes('mainnet') ? 'mainnet' : 'devnet')
     const address = String(walletAddress ?? signer.address)

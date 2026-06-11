@@ -10,15 +10,16 @@ const clientKey = (address: string) =>
  * RuntimeDeps. The first init signs a message to derive the master seed (cached
  * after, so reloads skip it).
  */
-async function init(ctx: ReturnType<typeof useWidgetContext>) {
-  const existing = ctx.runtimeDeps.getClient()
-  if (existing) return existing
-  const client = await ctx.services.sdkService.initPrivateMode({
-    walletAddress: ctx.walletAddress,
-    signer: ctx.walletSigner
-  })
-  ctx.runtimeDeps.setClient(client)
-  return client
+function init(ctx: ReturnType<typeof useWidgetContext>) {
+  // Single-flight: the registration mutation and the ensure query may both call
+  // this concurrently. `ensureClient` dedupes them to one `initPrivateMode`, so
+  // the master seed is derived (and signed) exactly once.
+  return ctx.runtimeDeps.ensureClient(() =>
+    ctx.services.sdkService.initPrivateMode({
+      walletAddress: ctx.walletAddress,
+      signer: ctx.walletSigner
+    })
+  )
 }
 
 /**

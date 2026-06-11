@@ -50,19 +50,11 @@ export function prefixedStore(
  */
 export function toSecureStorage(kv: WidgetStorage): SecureKeyValueStore {
   return {
-    getItem: async (key) => {
-      const v = await Promise.resolve(kv.getItem(key))
-      console.log('[uw secure] GET', key, v == null ? 'MISS' : `HIT(${v.length})`)
-      return v
-    },
-    setItem: (key, value) => {
-      console.log('[uw secure] SET', key, `len=${value.length}`)
-      return Promise.resolve(kv.setItem(key, value)).then(() => undefined)
-    },
-    removeItem: (key) => {
-      console.log('[uw secure] REMOVE', key)
-      return Promise.resolve(kv.removeItem(key)).then(() => undefined)
-    }
+    getItem: (key) => Promise.resolve(kv.getItem(key)),
+    setItem: (key, value) =>
+      Promise.resolve(kv.setItem(key, value)).then(() => undefined),
+    removeItem: (key) =>
+      Promise.resolve(kv.removeItem(key)).then(() => undefined)
   }
 }
 
