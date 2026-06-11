@@ -1,15 +1,30 @@
 import { TokenAvatar } from '@/ui/token-avatar'
 import { Skeleton } from '@/ui/skeleton'
+import { RefreshIcon } from '@/ui/icons'
 import { useHome } from '../hooks/use-home'
 
 export function HomeTab() {
-  const { rows, metaLoading, totalUsd, totalLoading } = useHome()
+  const { rows, metaLoading, totalUsd, totalLoading, isFetching, refetch } =
+    useHome()
   return (
     <div className='flex flex-col'>
       <div className='mb-4 flex flex-col  gap-1 px-2 py-2'>
-        <span className='text-[11px] font-semibold tracking-wider text-uw-text-tertiary'>
-          Private Balance
-        </span>
+        <div className='flex items-center gap-1.5'>
+          <span className='text-[11px] font-semibold tracking-wider text-uw-text-tertiary'>
+            Private Balance
+          </span>
+          <button
+            type='button'
+            onClick={refetch}
+            disabled={isFetching}
+            aria-label='Refresh balances'
+            className='text-uw-text-tertiary transition-opacity hover:opacity-70'
+          >
+            <RefreshIcon
+              className={`h-3 w-3 ${isFetching ? 'animate-uw-spin' : ''}`}
+            />
+          </button>
+        </div>
         {totalLoading ? (
           <Skeleton className='h-8 w-32' />
         ) : (

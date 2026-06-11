@@ -10,6 +10,8 @@ import { MIN_PUBLIC_SOL_FOR_SHIELD } from '@/constants/sol-requirements'
 import { fromBaseUnits, toBaseUnits } from '@/lib/amount'
 import { useShieldDeposit } from '../query'
 
+const SOL_MINT = 'So11111111111111111111111111111111111111112'
+
 /** Shield = deposit public → private, so it lists PUBLIC balances of the
  *  supported (private-mode) mints. */
 export function useShield() {
@@ -28,7 +30,15 @@ export function useShield() {
     ? fromBaseUnits(token.amount, token.decimals)
     : '—'
   const onMax = token
-    ? () => setAmount(fromBaseUnits(token.amount, token.decimals))
+    ? () => {
+        // For native SOL, leave the deposit fee behind so the tx can pay for
+        // itself — otherwise a true max would leave no SOL for fees.
+        const reserve =
+          token.mintAddress === SOL_MINT ? MIN_PUBLIC_SOL_FOR_SHIELD : 0n
+        const maxBase =
+          token.amount > reserve ? token.amount - reserve : 0n
+        setAmount(fromBaseUnits(maxBase, token.decimals))
+      }
     : undefined
 
   const canSubmit = useMemo(

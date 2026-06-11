@@ -41,6 +41,9 @@ all from one component you mount with a `signer` and an `rpcUrl`.
   into `dist`. Consumers do **not** install them. No aliases to configure.
 - **Two render modes** — modal (pass a `trigger` or control `open`) or inline.
 - **Themed at runtime** — `ui` prop maps to scoped CSS vars, no rebuild.
+  Full-width customizable tabs; brand mark auto-tints black/white for contrast.
+- **Flow feedback** — submit buttons show an inline spinner while pending; on
+  success/error a full-card overlay confirms the result with a 5s "Go Home".
 - **Browser-only** — uses Web Worker (ZK), WebCrypto, and IndexedDB.
 
 ---
@@ -59,15 +62,16 @@ export function GoPrivate({ signer }) {
   return (
     <UmbraWidget
       signer={signer}                // a @solana/kit signer — see "Signer" below
-      rpcUrl="https://your-rpc.example.com"
       trigger={<button>Go Private</button>}
     />
   )
 }
 ```
 
-That's the whole API surface. Everything else (`network`, `mints`, `tabs`, `ui`,
-`storage`, `endpoints`) is optional and defaults to Umbra production.
+`signer` is the only required prop. Everything else (`rpcUrl`, `network`,
+`mints`, `tabs`, `ui`, `storage`, `endpoints`, `padding`) is optional —
+`rpcUrl` defaults to a Helius endpoint by `network`, the rest to Umbra
+production. Pass `rpcUrl` to use your own provider.
 
 Two app-level requirements that the bundle can't satisfy for you — set them up
 once: **Node globals polyfill** and **Web Worker support**. See
@@ -132,6 +136,12 @@ auto-initializes; until it's ready the widget shows only the app icon.
 widget blocks them when **public SOL** is below the flow's minimum (button reads
 "Not enough SOL"). Claim is relayer-funded and exempt. Minimums in
 [Defaults reference](#defaults-reference).
+
+**Flow feedback.** While a flow is pending the submit button disables and shows
+an inline spinner beside its label. On settle, a full-card overlay covers the
+widget — a primary-coloured circle with a knocked-out tick (success) or cross
+(error) — and a "Go Home · Ns" button counts down from 5s, auto-returning to the
+Home tab at zero (or immediately on click).
 
 **Key consistency.** The widget verifies that locally-derived keys match what's
 on-chain and exposes a restore mutation when they diverge.
@@ -271,12 +281,26 @@ maps to a scoped CSS variable, re-themable at runtime.
       tabActive: '#1a1f2b'
     },
     font: { primary: 'Inter, system-ui, sans-serif' },
-    rounding: '14px'   // single value sets sm/md/lg; or pass { sm, md, lg }
+    rounding: '14px',  // single value sets sm/md/lg; or pass { sm, md, lg }
+
+    // Tabs are full-width and split the row equally. Style the row + each tab:
+    tabs: {
+      rowBg: '#11141b',     // background behind the whole tab row
+      rowPadding: '4px',    // padding inside the row (CSS length)
+      bg: 'transparent',    // inactive tab background
+      activeBg: '#1a1f2b',  // active tab background (alias of colors.tabActive)
+      border: 'transparent',// per-tab border (color only)
+      radius: '10px'        // rounding for the row and each tab
+    }
   }}
 />
 ```
 
-Full color/font/rounding fields: [`WidgetUiConfig`](src/types.ts#L54-L82).
+The brand mark **auto-tints** to pure black or white for contrast against the
+resolved `colors.bg` (luminance check) — no setting needed. Non-hex `bg`
+(`rgb()`, named, gradients) falls back to the black tint.
+
+Full color/font/tabs/rounding fields: [`WidgetUiConfig`](src/types.ts#L54-L96).
 
 ### Custom tokens, tabs, endpoints, storage
 
@@ -377,18 +401,19 @@ export function Wallet({ signer, rpcUrl }) {
 
 ## Props reference
 
-All props live on [`UmbraWidgetProps`](src/types.ts#L119-L144). `*` = required.
+All props live on [`UmbraWidgetProps`](src/types.ts#L125-L157). `*` = required.
 
 | Prop            | Type                              | Default                  | Notes                                                                 |
 | --------------- | --------------------------------- | ------------------------ | --------------------------------------------------------------------- |
 | `signer` \*     | `WidgetSigner`                    | —                        | `@solana/kit` signer. See [Signer](#signer-the-one-thing-to-get-right). |
-| `rpcUrl` \*     | `string`                          | —                        | Solana RPC HTTP endpoint. WS is derived (`https`→`wss`).              |
+| `rpcUrl`        | `string`                          | Helius by `network`      | Solana RPC HTTP endpoint. WS is derived (`https`→`wss`). Token metadata always uses Helius DAS regardless. |
 | `network`       | `'mainnet' \| 'devnet'`           | inferred from `rpcUrl`   | Override only if inference is wrong.                                  |
 | `mints`         | `WidgetMint[]`                    | `DEFAULT_MINTS`          | Supported tokens; metadata auto-resolved unless overridden.          |
 | `tabs`          | `WidgetTab[]`                     | all five, in order       | Subset & order of `home`/`shield`/`transfer`/`unshield`/`receive`.   |
-| `ui`            | `WidgetUiConfig`                  | light theme              | Partial theme overrides → scoped CSS vars.                           |
+| `ui`            | `WidgetUiConfig`                  | light theme              | Partial theme overrides → scoped CSS vars. Includes `tabs` chrome.   |
 | `storage`       | `WidgetStorage`                   | IndexedDB                | KV store; sync (`localStorage`) returns accepted.                    |
 | `endpoints`     | `WidgetEndpoints`                 | Umbra production         | Per-field override; each falls back to default.                      |
+| `padding`       | `number \| string`                | `20`                     | Inline widget only. Global padding; number → px.                     |
 | `walletAddress` | `Address \| string`               | `signer.address`         | Override the resolved current address.                               |
 | `open`          | `boolean`                         | —                        | Controlled modal open state.                                         |
 | `onOpenChange`  | `(open: boolean) => void`         | —                        | Modal open-change callback.                                          |
@@ -417,6 +442,8 @@ interface WidgetEndpoints {                      // each falls back to prod
   indexer?: string          // UTXO indexer (SDK indexerApiEndpoint)
   nullifierIndexer?: string // burnt-nullifier indexer (claimed-UTXO detection)
   relayer?: string          // gasless relayer
+  das?: string              // DAS-capable RPC for token metadata (getAssetBatch);
+                            //   defaults to Helius by network, independent of rpcUrl
   zkCdnUrl?: string         // ZK assets CDN base (no trailing slash)
   zkManifestUrl?: string    // defaults to `${zkCdnUrl}/v5/manifest.json`
 }
@@ -445,6 +472,7 @@ zinc155BS4mSPk8GXQj4R5hkVDQXcW253pTYq5SGyfi
 | `indexer`          | `https://utxo-indexer.api.umbraprivacy.com`      |
 | `nullifierIndexer` | `https://nullifier-indexer.api.umbraprivacy.com` |
 | `relayer`          | `https://relayer.api.umbraprivacy.com`           |
+| `das`              | Helius RPC by `network` (token metadata, DAS)    |
 | `zkCdnUrl`         | `https://zk.api.umbraprivacy.com`                |
 | `zkManifestUrl`    | `${zkCdnUrl}/v5/manifest.json`                   |
 

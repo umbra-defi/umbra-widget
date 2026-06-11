@@ -103,6 +103,10 @@
   --uw-radius-md: 16px;
   --uw-radius-lg: 24px;
 
+  /* Brand-icon tint. Pure black on a light bg; flipped to pure white when
+     `colors.bg` resolves dark (see apply-theme). Only ever black or white. */
+  --uw-icon-tint: #000000;
+
   color: var(--uw-text);
   font-family: var(--uw-font-primary);
 }

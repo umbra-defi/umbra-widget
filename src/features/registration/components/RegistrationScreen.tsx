@@ -1,7 +1,7 @@
 import { Button } from '@/ui/button'
 import { StatusRow } from '@/ui/status-row'
 import { useRegistration } from '../hooks/use-registration'
-import iconUrl from '@/assets/icon.png'
+import { BrandIcon } from '@/ui/brand-icon'
 
 /**
  * Shown when the connected account has no private account yet. Registering
@@ -16,12 +16,8 @@ export function RegistrationScreen() {
 
   return (
     <div className='flex flex-col items-center gap-8 py-8 text-center'>
-      <img
-        src={iconUrl}
-        alt=''
-        className={`h-24 w-24 rounded-2xl ${
-          pending ? 'animate-pulse-scale' : ''
-        }`}
+      <BrandIcon
+        className={`h-24 w-24 ${pending ? 'animate-pulse-scale' : ''}`}
       />
       <div>
         <h2 className='text-2xl font-bold leading-tight text-uw-text'>

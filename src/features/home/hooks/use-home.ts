@@ -25,7 +25,7 @@ export interface HomeRow {
 export function useHome() {
   const { mints } = useWidgetContext()
   const { metadataMap, isLoading: metaLoading } = useMintMetadataMap()
-  const { tokens, isLoading, isFetching } = useSupportedTokens({
+  const { tokens, isLoading, isFetching, refetch } = useSupportedTokens({
     mode: 'private'
   })
 
@@ -70,6 +70,7 @@ export function useHome() {
     rows,
     isLoading,
     isFetching,
+    refetch,
     metaLoading,
     totalUsd,
     totalLoading: balanceLoading

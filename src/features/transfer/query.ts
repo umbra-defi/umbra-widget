@@ -67,9 +67,7 @@ export function usePrivateSend() {
         const mint = String(variables.mint)
         const destination = String(variables.receiver ?? walletAddress)
         // Background — don't block the send's settled state on the claim.
-        void claimSelfBurnable(mint, destination).catch((err) =>
-          console.warn('[transfer] self-claim after send failed', err)
-        )
+        void claimSelfBurnable(mint, destination)
       }
     }
   })

@@ -1,4 +1,10 @@
 import { createWorkerRpc } from '@umbra-privacy/client-platform/web'
+// Inline the worker (base64 blob) rather than emitting a separate asset. A
+// separate file is referenced via `new URL('…', import.meta.url)`, which a host
+// bundler (webpack/Next) rewrites to a `file://` URL the browser refuses to load
+// as a Worker cross-origin. Inlining makes the widget self-contained — works in
+// any host with zero asset-serving config.
+import ZkProofWorker from './zk-proof-worker?worker&inline'
 import type {
   ZkProofWorkerRequest,
   ZkProofWorkerResponse
@@ -9,12 +15,7 @@ type RawProof = NonNullable<ZkProofWorkerResponse['proof']>
 const rpc = createWorkerRpc<
   Omit<ZkProofWorkerRequest, 'id'>,
   ZkProofWorkerResponse
->(
-  () =>
-    new Worker(new URL('./zk-proof-worker.ts', import.meta.url), {
-      type: 'module'
-    })
-)
+>(() => new ZkProofWorker())
 
 /**
  * Off-thread groth16 proving, shaped as the `proveFn` that

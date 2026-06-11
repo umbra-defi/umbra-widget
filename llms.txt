@@ -10,7 +10,7 @@ npm i @umbra-privacy/widget
 ```tsx
 import { UmbraWidget } from '@umbra-privacy/widget'
 import '@umbra-privacy/widget/styles.css'   // required
-<UmbraWidget signer={signer} rpcUrl="https://your-rpc" trigger={<button>Go Private</button>} />
+<UmbraWidget signer={signer} trigger={<button>Go Private</button>} />   // rpcUrl optional (defaults to Helius by network)
 ```
 
 Peer deps the host provides (not bundled): `react>=18`, `react-dom>=18`, `@solana/kit>=6`, `@tanstack/react-query>=5`, `@umbra-privacy/sdk@5.0.0-rc.4`.
@@ -33,16 +33,16 @@ Exports: `UmbraWidget`, `UmbraWidgetInline`, `DEFAULT_MINTS`. Types: `UmbraWidge
 
 ## Props
 
-`signer*` (WidgetSigner), `rpcUrl*` (string; WS derived https→wss), `network?` ('mainnet'|'devnet', inferred from rpcUrl), `mints?` (WidgetMint[], default DEFAULT_MINTS), `tabs?` (WidgetTab[] = 'home'|'shield'|'transfer'|'unshield'|'receive', default all), `ui?` (WidgetUiConfig, partial theme → scoped CSS vars), `storage?` (WidgetStorage KV, default IndexedDB), `endpoints?` (WidgetEndpoints, default Umbra prod), `walletAddress?` (default signer.address), `open?`/`onOpenChange?`/`trigger?` (modal control), `className?` (inline only).
+`signer*` (WidgetSigner), `rpcUrl?` (string; WS derived https→wss; defaults to Helius by network — token metadata always uses Helius DAS regardless), `network?` ('mainnet'|'devnet', inferred from rpcUrl), `mints?` (WidgetMint[], default DEFAULT_MINTS), `tabs?` (WidgetTab[] = 'home'|'shield'|'transfer'|'unshield'|'receive', default all), `ui?` (WidgetUiConfig, partial theme → scoped CSS vars; includes `tabs` chrome — full-width tabs, rowBg/rowPadding/bg/activeBg/border/radius), `storage?` (WidgetStorage KV, default IndexedDB), `endpoints?` (WidgetEndpoints, default Umbra prod), `padding?` (number|string, inline only, default 20 → px), `walletAddress?` (default signer.address), `open?`/`onOpenChange?`/`trigger?` (modal control), `className?` (inline only).
 
 ## Defaults
 
-Endpoints: indexer `https://utxo-indexer.api.umbraprivacy.com`, nullifierIndexer `https://nullifier-indexer.api.umbraprivacy.com` (needs CORS for browsers — proxy if missing, else claimed UTXOs not filtered), relayer `https://relayer.api.umbraprivacy.com`, zkCdnUrl `https://zk.api.umbraprivacy.com`, zkManifestUrl `${zkCdnUrl}/v5/manifest.json`.
+Endpoints: indexer `https://utxo-indexer.api.umbraprivacy.com`, nullifierIndexer `https://nullifier-indexer.api.umbraprivacy.com` (needs CORS for browsers — proxy if missing, else claimed UTXOs not filtered), relayer `https://relayer.api.umbraprivacy.com`, das (token metadata getAssetBatch; defaults to Helius by network, independent of rpcUrl), zkCdnUrl `https://zk.api.umbraprivacy.com`, zkManifestUrl `${zkCdnUrl}/v5/manifest.json`.
 Min public SOL (lamports): shield 13_000_000, unshield 13_000_000, transfer 20_000_000, register 13_000_000; claim relayer-funded (exempt). Below minimum → button reads "Not enough SOL".
 
 ## Behavior
 
-Registration gate: on-chain check; unregistered users get a one-time sign-to-register screen, then SDK client auto-inits (app-icon-only until ready). Key-consistency check with a restore mutation on mismatch. Claimed-UTXO filtering via burnt-nullifier indexer + local hash derivation (IndexedDB-cached). Legacy seed scheme registered for old accounts.
+Registration gate: on-chain check; unregistered users get a one-time sign-to-register screen, then SDK client auto-inits (app-icon-only until ready). Flow feedback: pending → inline button spinner; success/error → full-card overlay (primary circle with knockout tick/cross) + "Go Home · Ns" button counting down 5s, auto-returns to Home tab at zero. Brand mark auto-tints black/white for contrast vs colors.bg. Key-consistency check with a restore mutation on mismatch. Claimed-UTXO filtering via burnt-nullifier indexer + local hash derivation (IndexedDB-cached). Legacy seed scheme registered for old accounts.
 
 ## Source pointers
 

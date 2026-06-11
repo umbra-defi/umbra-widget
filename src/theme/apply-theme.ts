@@ -14,6 +14,10 @@ export function uiToCssVars(ui?: WidgetUiConfig): CSSProperties {
 
   if (colors) {
     set(vars, '--uw-bg', colors.bg)
+    // Tint the brand icon for contrast against the resolved bg.
+    if (colors.bg) {
+      set(vars, '--uw-icon-tint', isDark(colors.bg) ? '#ffffff' : '#000000')
+    }
     set(vars, '--uw-surface', colors.surface)
     set(vars, '--uw-surface-alt', colors.surfaceAlt)
     set(vars, '--uw-border', colors.border)
@@ -56,4 +60,25 @@ export function uiToCssVars(ui?: WidgetUiConfig): CSSProperties {
 
 function set(target: Record<string, string>, key: string, value?: string) {
   if (value != null) target[key] = value
+}
+
+/**
+ * Rough luminance test for `#rgb`/`#rrggbb` hex colors. Non-hex (e.g. `rgb()`,
+ * named, gradients) falls back to "light" so the default dark tint stands.
+ */
+function isDark(color: string): boolean {
+  const hex = color.trim().replace('#', '')
+  const full =
+    hex.length === 3
+      ? hex
+          .split('')
+          .map((c) => c + c)
+          .join('')
+      : hex
+  if (full.length !== 6 || /[^0-9a-f]/i.test(full)) return false
+  const r = parseInt(full.slice(0, 2), 16)
+  const g = parseInt(full.slice(2, 4), 16)
+  const b = parseInt(full.slice(4, 6), 16)
+  // Perceived luminance (ITU-R BT.601).
+  return (r * 299 + g * 587 + b * 114) / 1000 < 128
 }

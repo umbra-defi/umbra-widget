@@ -7,6 +7,7 @@ import {
 } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { SuccessOverlay } from '@/ui/success-overlay'
+import { BrandIcon } from '@/ui/brand-icon'
 import { Tabs, TabsList, TabsTrigger } from '@/ui/tabs'
 import type { WidgetTab } from '@/types'
 import { RegistrationScreen } from '@/features/registration/components/RegistrationScreen'
@@ -17,7 +18,6 @@ import { ShieldTab } from '@/features/shield/components/ShieldTab'
 import { TransferTab } from '@/features/transfer/components/TransferTab'
 import { UnshieldTab } from '@/features/unshield/components/UnshieldTab'
 import { ReceiveTab } from '@/features/receive/components/ReceiveTab'
-import iconUrl from '@/assets/icon.png'
 
 const TAB_LABEL: Record<WidgetTab, string> = {
   home: 'Home',
@@ -70,11 +70,7 @@ export function WidgetBody({ tabs }: { tabs: WidgetTab[] }) {
     bodyKey = 'loading'
     content = (
       <div className='flex items-center justify-center p-32'>
-        <img
-          src={iconUrl}
-          alt=''
-          className='h-16 w-16 animate-pulse rounded-xl'
-        />
+        <BrandIcon className='h-16 w-16 animate-pulse' />
       </div>
     )
   } else if (!isRegistered) {
