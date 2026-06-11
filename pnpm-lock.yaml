@@ -1909,7 +1909,7 @@ packages:
         optional: true
 
   '@umbra-privacy/client@file:tarballs/umbra-privacy-client-1.0.0.tgz':
-    resolution: {integrity: sha512-HqE8XgI7EHSDK675SK2Z6X4HrP/js25w3HRlKeaV8HdF9GiTA9BU2n6HbQcx2e+sy95TSwqCNHuD0eGfLP00Xw==, tarball: file:tarballs/umbra-privacy-client-1.0.0.tgz}
+    resolution: {integrity: sha512-yuq8Cz7i/egob73EuWhCxmUxaeB8zxc3cZtktv6E1YIv8GpxJbg73lqxFCdSo+jZe8tVPmiWhUAklu2Q14xEcQ==, tarball: file:tarballs/umbra-privacy-client-1.0.0.tgz}
     version: 1.0.0
     peerDependencies:
       '@tanstack/react-query': 5.100.10

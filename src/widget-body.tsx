@@ -1,5 +1,12 @@
-import { useEffect, useState, type FC, type ReactNode } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useState,
+  type FC,
+  type ReactNode
+} from 'react'
 import { AnimatePresence, motion } from 'motion/react'
+import { SuccessOverlay } from '@/ui/success-overlay'
 import { Tabs, TabsList, TabsTrigger } from '@/ui/tabs'
 import type { WidgetTab } from '@/types'
 import { RegistrationScreen } from '@/features/registration/components/RegistrationScreen'
@@ -41,6 +48,10 @@ export function WidgetBody({ tabs }: { tabs: WidgetTab[] }) {
   // show only the app icon.
   const { isSuccess: clientReady } = useEnsureUmbraClient(isRegistered)
   const [active, setActive] = useState<WidgetTab>(tabs[0] ?? 'home')
+  const goHome = useCallback(
+    () => setActive(tabs.includes('home') ? 'home' : (tabs[0] ?? 'home')),
+    [tabs]
+  )
 
   // Keep the splash up for at least 2s so it doesn't flash on fast loads.
   const [minElapsed, setMinElapsed] = useState(false)
@@ -107,6 +118,8 @@ export function WidgetBody({ tabs }: { tabs: WidgetTab[] }) {
           {content}
         </motion.div>
       </AnimatePresence>
+
+      {showTabs && <SuccessOverlay onGoHome={goHome} />}
     </motion.div>
   )
 }

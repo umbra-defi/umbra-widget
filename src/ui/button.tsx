@@ -2,6 +2,7 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import type { ButtonHTMLAttributes } from 'react'
 import { forwardRef } from 'react'
 import { cn } from '@/ui/lib/utils'
+import { Spinner } from '@/ui/spinner'
 
 const buttonVariants = cva(
   'inline-flex items-center justify-center font-semibold transition-opacity disabled:opacity-50 disabled:pointer-events-none',
@@ -24,15 +25,22 @@ const buttonVariants = cva(
 export interface ButtonProps
   extends
     ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {}
+    VariantProps<typeof buttonVariants> {
+  /** Show a spinner beside the label and disable the button. */
+  loading?: boolean
+}
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, ...props }, ref) => (
+  ({ className, variant, size, loading, disabled, children, ...props }, ref) => (
     <button
       ref={ref}
+      disabled={disabled || loading}
       className={cn(buttonVariants({ variant, size }), className)}
       {...props}
-    />
+    >
+      {loading && <Spinner className='mr-2' />}
+      {children}
+    </button>
   )
 )
 Button.displayName = 'Button'

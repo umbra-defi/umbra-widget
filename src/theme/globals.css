@@ -19,6 +19,16 @@
   animation: uw-pulse-scale 1.4s ease-in-out infinite;
 }
 
+/* Inline button spinner. */
+@keyframes uw-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.animate-uw-spin {
+  animation: uw-spin 0.7s linear infinite;
+}
+
 /* Status ring overlay (see StatusBorder). Masked so only the border shows. */
 .uw-status-ring {
   position: absolute;
@@ -78,6 +88,13 @@
   /* Active tab pill background. Theme-agnostic translucent grey so it reads on
      both light and dark surfaces. */
   --uw-tab-active: rgba(127, 137, 155, 0.16);
+  /* Tab row + per-tab chrome. Transparent by default — the row is full-width
+     and each tab splits it equally. Override via `ui.tabs`. */
+  --uw-tab-row-bg: transparent;
+  --uw-tab-row-padding: 0px;
+  --uw-tab-bg: transparent;
+  --uw-tab-border: transparent;
+  --uw-tab-radius: 9999px;
 
   --uw-font-primary: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --uw-font-secondary: var(--uw-font-primary);

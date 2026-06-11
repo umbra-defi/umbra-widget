@@ -12,7 +12,8 @@ export const TabsList = forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      'flex w-full flex-nowrap items-center justify-center gap-0.5 overflow-x-auto',
+      'flex w-full flex-nowrap items-center gap-0.5 overflow-x-auto',
+      'rounded-[var(--uw-tab-radius)] bg-[var(--uw-tab-row-bg)] p-[var(--uw-tab-row-padding)]',
       className
     )}
     {...props}
@@ -27,7 +28,8 @@ export const TabsTrigger = forwardRef<
   <TabsPrimitive.Trigger
     ref={ref}
     className={cn(
-      'shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-[13px] font-semibold text-uw-text-tertiary transition-colors hover:text-uw-text',
+      'min-w-0 flex-1 basis-0 whitespace-nowrap px-3 py-1.5 text-center text-[13px] font-semibold text-uw-text-tertiary transition-colors hover:text-uw-text',
+      'rounded-[var(--uw-tab-radius)] border border-[var(--uw-tab-border)] bg-[var(--uw-tab-bg)]',
       'data-[state=active]:bg-uw-tab-active data-[state=active]:font-bold data-[state=active]:text-uw-primary',
       className
     )}

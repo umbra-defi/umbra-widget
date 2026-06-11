@@ -226,7 +226,27 @@ function WidgetMount({
       signer={signer}
       rpcUrl={RPC_URL}
       network='mainnet'
-      // ui={umbraThemeDark}
+      ui={{
+        colors: {
+          bg: '#0C0D10',
+          surface: '#15161B',
+          surfaceAlt: '#1B1C22',
+          border: '#26272D',
+          text: '#EDEDEE',
+          textSecondary: '#9B9FA6',
+          textTertiary: '#686C74',
+          primary: '#F97316',
+          primaryFg: '#FFFFFF',
+          danger: '#F4524D',
+          success: '#2EBD85',
+          tabActive: '#232429'
+        },
+        font: {
+          primary: "var(--font-chakra, 'Chakra Petch'), sans-serif",
+          secondary: "var(--font-plex-mono, 'IBM Plex Mono'), monospace"
+        },
+        rounding: { sm: '4px', md: '8px', lg: '12px' }
+      }}
       tabs={['home', 'shield', 'transfer', 'unshield', 'receive']}
       open={open}
       onOpenChange={onOpenChange}

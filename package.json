@@ -57,7 +57,13 @@
     "@tanstack/react-query": ">=5",
     "@umbra-privacy/sdk": "5.0.0-rc.4",
     "react": ">=18",
-    "react-dom": ">=18"
+    "react-dom": ">=18",
+    "snarkjs": ">=0.7"
+  },
+  "peerDependenciesMeta": {
+    "snarkjs": {
+      "comment": "Required transitively: @umbra-privacy/sdk imports snarkjs statically (its 'optional' peer flag doesn't hold for bundlers). Install it in the host."
+    }
   },
   "devDependencies": {
     "@noble/hashes": "^2.2.0",

@@ -22,7 +22,11 @@ export function UnshieldTab() {
         <span className='text-uw-text-secondary'>Unshielding Fee</span>
         <span className='text-uw-text'>No Fee · $0.00</span>
       </div>
-      <Button disabled={!u.canSubmit} onClick={u.submit}>
+      <Button
+        loading={u.status === 'pending'}
+        disabled={!u.canSubmit}
+        onClick={u.submit}
+      >
         {u.status === 'pending'
           ? 'Unshielding…'
           : u.lowSol

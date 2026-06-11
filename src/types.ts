@@ -71,6 +71,21 @@ export interface WidgetUiConfig {
     primary?: string
     secondary?: string
   }
+  /** Tab row + per-tab chrome. Tabs are full-width and split the row equally. */
+  tabs?: {
+    /** Background of the whole tab row. */
+    rowBg?: string
+    /** Padding of the tab row (CSS length, e.g. `'4px'`). */
+    rowPadding?: string
+    /** Inactive tab background. */
+    bg?: string
+    /** Active tab background (alias of {@link WidgetUiConfig.colors.tabActive}). */
+    activeBg?: string
+    /** Per-tab border (CSS color or `'1px solid #...'` is NOT accepted — color only). */
+    border?: string
+    /** Corner rounding for the row and each tab. */
+    radius?: string
+  }
   /** Corner rounding. A single value sets all three; granular overrides allowed. */
   rounding?:
     | string
@@ -109,6 +124,12 @@ export interface WidgetEndpoints {
   nullifierIndexer?: string
   /** Gasless relayer. */
   relayer?: string
+  /**
+   * DAS-capable RPC for token metadata (`getAssetBatch`). Defaults to a Helius
+   * endpoint by network — token metadata needs DAS, which plain RPCs lack, so
+   * this is resolved independently of `rpcUrl`.
+   */
+  das?: string
   /** ZK assets CDN base (no trailing slash). */
   zkCdnUrl?: string
   /** ZK manifest URL. Defaults to `${zkCdnUrl}/v5/manifest.json`. */
@@ -119,8 +140,12 @@ export interface WidgetEndpoints {
 export interface UmbraWidgetProps {
   /** Wallet signer (see {@link WidgetSigner}). */
   signer: WidgetSigner
-  /** Solana RPC HTTP endpoint. WS endpoint is derived (https→wss). */
-  rpcUrl: string
+  /**
+   * Solana RPC HTTP endpoint (WS derived https→wss). Optional — defaults to a
+   * Helius endpoint by `network`. Token metadata always uses a DAS-capable
+   * Helius endpoint (see {@link WidgetEndpoints.das}) regardless of this value.
+   */
+  rpcUrl?: string
   network?: WidgetNetwork
   /** Theme overrides. */
   ui?: WidgetUiConfig
@@ -141,4 +166,7 @@ export interface UmbraWidgetProps {
 
   /** Override the resolved current wallet address (defaults to signer.address). */
   walletAddress?: Address | string
+
+  /** Global padding for the inline widget. Number → px. Defaults to 20. */
+  padding?: number | string
 }

@@ -23,7 +23,11 @@ export function ShieldTab() {
         <span className='text-uw-text-secondary'>Shielding Fee</span>
         <span className='text-uw-text'>No Fee · $0.00</span>
       </div>
-      <Button disabled={!s.canSubmit} onClick={s.submit}>
+      <Button
+        loading={s.status === 'pending'}
+        disabled={!s.canSubmit}
+        onClick={s.submit}
+      >
         {s.status === 'pending'
           ? 'Shielding…'
           : s.lowSol

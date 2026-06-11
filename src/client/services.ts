@@ -10,7 +10,13 @@ import {
   utxoQueries,
   type ClaimSyncStore
 } from '@umbra-privacy/client/utxo'
-import { address as toAddress, type Address } from '@solana/kit'
+import {
+  address as toAddress,
+  createSolanaRpc,
+  type Address,
+  type Rpc,
+  type SolanaRpcApi
+} from '@solana/kit'
 import {
   createSdkService,
   isReceiverRegistered,
@@ -83,7 +89,16 @@ export function buildServices(deps: BuildServicesDeps) {
     ops
   })
 
-  const solanaService = createSolanaService(ctx)
+  // Token metadata uses the DAS method `getAssetBatch`, which only Helius-class
+  // RPCs implement — so it runs against `endpoints.das` (Helius), NOT the
+  // possibly-non-DAS `rpcUrl`. A second solana service pointed at the DAS
+  // endpoint; everything else stays on the tx `rpcUrl` via `ctx`.
+  const dasRpc = createSolanaRpc(endpoints.das) as Rpc<SolanaRpcApi>
+  const dasSolanaService = createSolanaService({
+    ...ctx,
+    getRpc: () => dasRpc,
+    getRpcUrl: () => endpoints.das
+  })
 
   const utxoService = createUtxoService({
     getClient: ctx.getClient,
@@ -108,7 +123,7 @@ export function buildServices(deps: BuildServicesDeps) {
 
   // Token metadata (image / name / ticker / decimals) via Helius getAssetBatch.
   const tokenService = createTokenService({
-    getSolanaService: () => solanaService,
+    getSolanaService: () => dasSolanaService,
     getClient: ctx.getClient,
     solana: {
       getTokenProgramAddress: (mint: Address) =>

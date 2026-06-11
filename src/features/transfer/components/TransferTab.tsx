@@ -24,7 +24,11 @@ export function TransferTab() {
         onChange={(e) => t.setRecipient(e.target.value)}
         className='w-full rounded-uw-md border border-uw-border bg-uw-surface px-4 py-3 text-sm text-uw-text outline-none placeholder:text-uw-text-tertiary'
       />
-      <Button disabled={!t.canSubmit} onClick={t.submit}>
+      <Button
+        loading={t.status === 'pending'}
+        disabled={!t.canSubmit}
+        onClick={t.submit}
+      >
         {t.status === 'pending'
           ? 'Sending…'
           : t.lowSol

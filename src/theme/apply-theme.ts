@@ -10,7 +10,7 @@ export function uiToCssVars(ui?: WidgetUiConfig): CSSProperties {
   const vars: Record<string, string> = {}
   if (!ui) return vars as CSSProperties
 
-  const { colors, font, rounding } = ui
+  const { colors, font, rounding, tabs } = ui
 
   if (colors) {
     set(vars, '--uw-bg', colors.bg)
@@ -30,6 +30,15 @@ export function uiToCssVars(ui?: WidgetUiConfig): CSSProperties {
   if (font) {
     set(vars, '--uw-font-primary', font.primary)
     set(vars, '--uw-font-secondary', font.secondary)
+  }
+
+  if (tabs) {
+    set(vars, '--uw-tab-row-bg', tabs.rowBg)
+    set(vars, '--uw-tab-row-padding', tabs.rowPadding)
+    set(vars, '--uw-tab-bg', tabs.bg)
+    set(vars, '--uw-tab-active', tabs.activeBg)
+    set(vars, '--uw-tab-border', tabs.border)
+    set(vars, '--uw-tab-radius', tabs.radius)
   }
 
   if (typeof rounding === 'string') {

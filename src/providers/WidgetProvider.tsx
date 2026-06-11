@@ -16,7 +16,7 @@ import {
 import { createIndexedDbStorage } from '@/client/idb-storage'
 import { createClaimSyncStore } from '@umbra-privacy/client/utxo'
 import { buildServices } from '@/client/services'
-import { resolveEndpoints } from '@/constants/endpoints'
+import { resolveEndpoints, defaultRpcUrl } from '@/constants/endpoints'
 import { createWidgetQueryClient } from './query-client'
 import { useMintMetadataMap } from '@/features/token/hooks/use-tokens'
 import { WidgetContext, type WidgetContextValue } from './widget-context'
@@ -88,15 +88,17 @@ export function WidgetProvider({
   const [persister] = useState(makePersister)
 
   const value = useMemo<WidgetContextValue>(() => {
-    const resolvedNetwork =
-      network ?? (rpcUrl.includes('mainnet') ? 'mainnet' : 'devnet')
+    const resolvedNetwork: 'mainnet' | 'devnet' =
+      network ?? (rpcUrl?.includes('devnet') ? 'devnet' : 'mainnet')
+    // rpcUrl is optional — default to the Helius endpoint for the network.
+    const resolvedRpcUrl = rpcUrl ?? defaultRpcUrl(resolvedNetwork)
     const address = String(walletAddress ?? signer.address)
     const kv = storage ?? defaultStorage
 
-    const rpc = createSolanaRpc(rpcUrl) as Rpc<SolanaRpcApi>
+    const rpc = createSolanaRpc(resolvedRpcUrl) as Rpc<SolanaRpcApi>
     const walletSigner = makeWalletSigner(signer, rpc)
     const runtimeDeps = createRuntimeDeps({
-      rpcUrl,
+      rpcUrl: resolvedRpcUrl,
       network: resolvedNetwork,
       walletSigner,
       walletAddress: address
@@ -112,11 +114,11 @@ export function WidgetProvider({
         toKeyValueStore(prefixedStore(kv, 'umbra:claim-sync:'))
       ),
       mintAddresses: resolvedMints.map((m) => m.address),
-      endpoints: resolveEndpoints(endpoints)
+      endpoints: resolveEndpoints(resolvedNetwork, endpoints)
     })
 
     return {
-      rpcUrl,
+      rpcUrl: resolvedRpcUrl,
       network: resolvedNetwork,
       walletAddress: address,
       mints: mints ?? DEFAULT_MINTS,

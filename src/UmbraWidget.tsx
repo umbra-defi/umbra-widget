@@ -4,10 +4,8 @@ import { uiToCssVars } from '@/theme/apply-theme'
 import { ThemeVarsContext } from '@/theme/theme-context'
 import { WidgetProvider } from '@/providers/WidgetProvider'
 import { WidgetBody } from '@/widget-body'
-import { WidgetHeader } from '@/ui/widget-header'
 import { Dialog, DialogContent, DialogTrigger } from '@/ui/dialog'
 import { FlowStatusProvider } from '@/providers/flow-status'
-import { ModalStatusRing } from '@/ui/status-border'
 import { cn } from '@/ui/lib/utils'
 import '@/theme/globals.css'
 
@@ -37,11 +35,10 @@ function useWidgetShell(props: UmbraWidgetProps) {
           endpoints={props.endpoints}
           walletAddress={props.walletAddress}
         >
-          <WidgetHeader />
+          {/* <WidgetHeader /> */}
           <WidgetBody tabs={resolvedTabs} />
         </WidgetProvider>
       </ThemeVarsContext.Provider>
-      <ModalStatusRing />
     </FlowStatusProvider>
   )
 
@@ -56,14 +53,18 @@ export function UmbraWidgetInline(
   props: UmbraWidgetProps & { className?: string }
 ) {
   const { themeVars, framed } = useWidgetShell(props)
+  const padding = props.padding ?? 20
   return (
     <div
       className={cn(
         'uw-root relative bg-uw-bg',
         props.className ??
-          'w-[min(540px,94vw)] rounded-uw-lg border border-uw-border p-7'
+          'w-[min(540px,94vw)] rounded-uw-lg border border-uw-border'
       )}
-      style={themeVars}
+      style={{
+        ...themeVars,
+        padding: typeof padding === 'number' ? `${padding}px` : padding
+      }}
     >
       {framed}
     </div>

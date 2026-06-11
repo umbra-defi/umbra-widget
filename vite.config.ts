@@ -24,11 +24,38 @@ export default defineConfig({
     react(),
     dts({ rollupTypes: true, tsconfigPath: './tsconfig.build.json' })
   ],
+  // Relative base so the emitted ZK-worker asset is referenced as a RELATIVE
+  // `new URL('./assets/…', import.meta.url)` instead of a root-absolute
+  // `/assets/…` — the latter is unresolvable by host bundlers and would require
+  // the host to serve the file from its origin root.
+  base: './',
   resolve: {
+    // Browser-first resolution. This is a browser-only widget, but the lib
+    // build otherwise picks Node entries of isomorphic deps — e.g.
+    // @solana/web3.js@1.x's `fetch-impl` and cross-fetch both pull in
+    // `node-fetch` (→ Node `stream`, absent in the browser → throws at import).
+    // Preferring the `browser` field/condition makes them resolve to native
+    // `fetch` instead.
+    mainFields: ['browser', 'module', 'jsnext:main', 'jsnext', 'main'],
+    conditions: ['browser', 'import', 'module', 'default'],
     alias: [
       {
         find: /^@noble\/hashes\/(sha2|sha3|utils)$/,
         replacement: '@noble/hashes/$1.js'
+      },
+      // node-fetch is dead in the browser (native fetch exists) but gets pulled
+      // in two ways — directly by @solana/web3.js@1.x's `fetch-impl`
+      // (`import * as nodeFetch from 'node-fetch'`) and via cross-fetch's Node
+      // entry. Its Node `stream` dep gets stubbed to an empty object → throws at
+      // import (`Wa.Readable.prototype`). Map both to cross-fetch's browser
+      // ponyfill (default/fetch/Headers/Request/Response over native fetch).
+      {
+        find: /^cross-fetch$/,
+        replacement: 'cross-fetch/dist/browser-ponyfill.js'
+      },
+      {
+        find: /^node-fetch$/,
+        replacement: 'cross-fetch/dist/browser-ponyfill.js'
       }
     ]
   },
