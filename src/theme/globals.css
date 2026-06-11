@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Gentle breathing pulse for the registration icon while signing/registering. */
+@keyframes uw-pulse-scale {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 0.7;
+  }
+}
+
+.animate-pulse-scale {
+  animation: uw-pulse-scale 1.4s ease-in-out infinite;
+}
+
+/* Status ring overlay (see StatusBorder). Masked so only the border shows. */
+.uw-status-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--uw-radius-lg);
+  padding: 4px;
+  pointer-events: none;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  transition: opacity 0.5s ease;
+}
+.uw-status-ring--pending {
+  background: linear-gradient(
+    110deg,
+    transparent 20%,
+    var(--uw-primary) 50%,
+    transparent 80%
+  );
+  background-size: 200% 100%;
+  animation: uw-ring-shimmer 3s linear infinite;
+}
+.uw-status-ring--success {
+  background: var(--uw-success);
+}
+.uw-status-ring--error {
+  background: var(--uw-danger);
+}
+@keyframes uw-ring-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/*
+ * Built-in defaults. Every value is a CSS custom property scoped under the
+ * widget root class so a host page's own styles never leak in or out. The
+ * `ui` prop overrides any of these at runtime (see apply-theme.ts).
+ */
+.uw-root {
+  --uw-bg: #ffffff;
+  --uw-surface: #f6f7f9;
+  --uw-surface-alt: #eef0f3;
+  --uw-border: #e3e6ea;
+  --uw-text: #0b0d12;
+  --uw-text-secondary: #5b6370;
+  --uw-text-tertiary: #9aa1ad;
+  --uw-primary: #3b9dff;
+  --uw-primary-fg: #ffffff;
+  --uw-danger: #ff4d4f;
+  --uw-success: #2bbf73;
+  /* Active tab pill background. Theme-agnostic translucent grey so it reads on
+     both light and dark surfaces. */
+  --uw-tab-active: rgba(127, 137, 155, 0.16);
+
+  --uw-font-primary: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --uw-font-secondary: var(--uw-font-primary);
+
+  --uw-radius-sm: 10px;
+  --uw-radius-md: 16px;
+  --uw-radius-lg: 24px;
+
+  color: var(--uw-text);
+  font-family: var(--uw-font-primary);
+}
