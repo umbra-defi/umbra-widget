@@ -1,7 +1,4 @@
-import {
-  useIsRestoringKeyConsistency,
-  useKeyConsistencyQuery
-} from '../query'
+import { useIsRestoringKeyConsistency, useKeyConsistencyQuery } from '../query'
 
 export interface PrivateKeysReadyState {
   keysReady: boolean

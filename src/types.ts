@@ -5,6 +5,9 @@ import type {
   TransactionPartialSigner,
   TransactionSendingSigner
 } from '@solana/kit'
+import type { WidgetTextConfig } from '@/text/defaults'
+
+export type { WidgetTextConfig }
 
 /**
  * The wallet the widget signs with. A `@solana/kit` signer that:
@@ -39,12 +42,7 @@ export interface WidgetMint {
 }
 
 /** Which flows to surface as tabs, in order. */
-export type WidgetTab =
-  | 'home'
-  | 'shield'
-  | 'transfer'
-  | 'unshield'
-  | 'receive'
+export type WidgetTab = 'home' | 'shield' | 'transfer' | 'unshield' | 'receive'
 
 /**
  * Theme. Every field maps to a CSS custom property scoped to the widget root,
@@ -149,6 +147,11 @@ export interface UmbraWidgetProps {
   network?: WidgetNetwork
   /** Theme overrides. */
   ui?: WidgetUiConfig
+  /**
+   * User-facing copy overrides. Every label is optional and falls back to the
+   * built-in default, so override only the strings you want to change.
+   */
+  text?: WidgetTextConfig
   /** Supported tokens. Defaults to {@link DEFAULT_MINTS}. */
   mints?: WidgetMint[]
   /** Tabs to render, in order. Defaults to all four. */

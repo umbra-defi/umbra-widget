@@ -1,6 +1,13 @@
 import { cn } from '@/ui/lib/utils'
 
-const COLORS = ['#3b9dff', '#9b5cff', '#2bbf73', '#ff8a3b', '#ff4d6d', '#33c9d6']
+const COLORS = [
+  '#3b9dff',
+  '#9b5cff',
+  '#2bbf73',
+  '#ff8a3b',
+  '#ff4d6d',
+  '#33c9d6'
+]
 
 function colorFor(seed: string): string {
   let h = 0

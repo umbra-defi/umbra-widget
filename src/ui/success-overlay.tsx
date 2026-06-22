@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { useFlowStatus } from '@/providers/flow-status'
 import { Button } from '@/ui/button'
+import { useText } from '@/text/text-context'
 
 const COUNTDOWN = 5
 
@@ -47,6 +48,7 @@ function StatusIcon({ tone }: { tone: Tone }) {
  */
 export function SuccessOverlay({ onGoHome }: { onGoHome: () => void }) {
   const status = useFlowStatus()
+  const t = useText().successOverlay
   const open = status === 'success' || status === 'error'
   // Retain the last tone through the exit animation.
   const [tone, setTone] = useState<Tone>('success')
@@ -95,7 +97,7 @@ export function SuccessOverlay({ onGoHome }: { onGoHome: () => void }) {
             </motion.div>
           </div>
           <Button className='w-full' onClick={onGoHome}>
-            Go Home · {secs}s
+            {t.goHome} · {secs}s
           </Button>
         </motion.div>
       )}

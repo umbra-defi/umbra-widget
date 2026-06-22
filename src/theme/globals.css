@@ -96,7 +96,8 @@
   --uw-tab-border: transparent;
   --uw-tab-radius: 9999px;
 
-  --uw-font-primary: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --uw-font-primary:
+    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
   --uw-font-secondary: var(--uw-font-primary);
 
   --uw-radius-sm: 10px;

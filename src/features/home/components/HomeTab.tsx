@@ -1,9 +1,11 @@
 import { TokenAvatar } from '@/ui/token-avatar'
 import { Skeleton } from '@/ui/skeleton'
 import { RefreshIcon } from '@/ui/icons'
+import { useText } from '@/text/text-context'
 import { useHome } from '../hooks/use-home'
 
 export function HomeTab() {
+  const t = useText().home
   const { rows, metaLoading, totalUsd, totalLoading, isFetching, refetch } =
     useHome()
   return (
@@ -11,13 +13,13 @@ export function HomeTab() {
       <div className='mb-4 flex flex-col  gap-1 px-2 py-2'>
         <div className='flex items-center gap-1.5'>
           <span className='text-[11px] font-semibold tracking-wider text-uw-text-tertiary'>
-            Private Balance
+            {t.balanceLabel}
           </span>
           <button
             type='button'
             onClick={refetch}
             disabled={isFetching}
-            aria-label='Refresh balances'
+            aria-label={t.refresh}
             className='text-uw-text-tertiary transition-opacity hover:opacity-70'
           >
             <RefreshIcon
@@ -34,10 +36,10 @@ export function HomeTab() {
 
       <div className='flex items-center justify-between px-2 pb-1'>
         <span className='text-[11px] font-semibold uppercase tracking-wider text-uw-text-tertiary'>
-          Asset
+          {t.assetHeader}
         </span>
         <span className='text-[11px] font-semibold uppercase tracking-wider text-uw-text-tertiary'>
-          Private balance
+          {t.balanceHeader}
         </span>
       </div>
 
@@ -47,7 +49,7 @@ export function HomeTab() {
 
       {!metaLoading && rows.length === 0 && (
         <div className='py-8 text-center text-sm text-uw-text-secondary'>
-          No supported tokens
+          {t.empty}
         </div>
       )}
     </div>

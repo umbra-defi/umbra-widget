@@ -4,6 +4,7 @@ import { TokenAvatar } from '@/ui/token-avatar'
 import { Skeleton } from '@/ui/skeleton'
 import { RefreshIcon } from '@/ui/icons'
 import { fromBaseUnits } from '@/lib/amount'
+import { useText } from '@/text/text-context'
 import { useReceive } from '../hooks/use-receive'
 
 function truncate(addr: string): string {
@@ -25,13 +26,12 @@ function NoteRowSkeleton() {
 
 export function ReceiveTab() {
   const r = useReceive()
+  const t = useText().receive
   const count = r.utxos.length
   return (
     <div className='flex flex-col gap-3'>
       <div className='flex items-center justify-between px-1'>
-        <span className='text-sm font-semibold text-uw-text'>
-          Claimable Notes
-        </span>
+        <span className='text-sm font-semibold text-uw-text'>{t.title}</span>
         <div className='flex items-center gap-2'>
           <span className='text-xs font-medium text-uw-text-tertiary'>
             {r.isFetching ? '…' : count}
@@ -40,7 +40,7 @@ export function ReceiveTab() {
             type='button'
             onClick={r.refetch}
             disabled={r.isFetching}
-            title='Refresh'
+            title={t.refresh}
             className='text-uw-text-tertiary transition-colors hover:text-uw-text disabled:opacity-50'
           >
             <RefreshIcon className={r.isFetching ? 'animate-spin' : ''} />
@@ -58,7 +58,7 @@ export function ReceiveTab() {
 
       {!r.isFetching && count === 0 && (
         <div className='rounded-uw-md border border-uw-border py-8 text-center text-sm text-uw-text-secondary'>
-          Nothing to claim
+          {t.empty}
         </div>
       )}
 
@@ -74,8 +74,8 @@ export function ReceiveTab() {
             // receiver-burnable = someone sent it to you → show sender.
             const selfClaim = u.type.includes('self-burnable')
             const peerLabel = selfClaim
-              ? `To ${truncate(String(u.destinationAddress))}`
-              : `From ${truncate(String(u.senderAddress))}`
+              ? `${t.toPrefix} ${truncate(String(u.destinationAddress))}`
+              : `${t.fromPrefix} ${truncate(String(u.senderAddress))}`
             return (
               <div
                 key={u.id}
@@ -96,7 +96,7 @@ export function ReceiveTab() {
                   disabled={claiming}
                   onClick={() => r.claimOne(u)}
                 >
-                  {claiming ? 'Claiming…' : 'Claim'}
+                  {claiming ? t.claimPending : t.claim}
                 </Button>
               </div>
             )

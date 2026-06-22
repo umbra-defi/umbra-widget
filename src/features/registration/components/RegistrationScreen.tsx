@@ -2,6 +2,7 @@ import { Button } from '@/ui/button'
 import { StatusRow } from '@/ui/status-row'
 import { useRegistration } from '../hooks/use-registration'
 import { BrandIcon } from '@/ui/brand-icon'
+import { useText } from '@/text/text-context'
 
 /**
  * Shown when the connected account has no private account yet. Registering
@@ -11,6 +12,7 @@ import { BrandIcon } from '@/ui/brand-icon'
  */
 export function RegistrationScreen() {
   const r = useRegistration()
+  const t = useText().registration
 
   const pending = r.status === 'pending'
 
@@ -21,19 +23,15 @@ export function RegistrationScreen() {
       />
       <div>
         <h2 className='text-2xl font-bold leading-tight text-uw-text'>
-          Register on Umbra Protocol
+          {t.title}
         </h2>
         <p className='mt-3 text-base leading-relaxed text-uw-text-secondary'>
-          Sign once to register your private account on Umbra Protocol. Your
-          shielded keys are derived locally on your device — Umbra never sees
-          them.
+          {t.description}
         </p>
       </div>
       <div className='w-full'>
         {r.lowSol && (
-          <p className='mb-2 text-sm font-medium text-uw-danger'>
-            Not enough SOL to cover registration fees.
-          </p>
+          <p className='mb-2 text-sm font-medium text-uw-danger'>{t.lowSol}</p>
         )}
         <StatusRow status={r.status} error={r.error} />
         <Button
@@ -41,7 +39,7 @@ export function RegistrationScreen() {
           disabled={pending || r.isChecking || r.lowSol}
           onClick={r.register}
         >
-          {pending ? 'Setting up…' : 'Get Started'}
+          {pending ? t.submitPending : t.submit}
         </Button>
       </div>
     </div>

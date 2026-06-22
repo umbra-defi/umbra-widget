@@ -21,9 +21,7 @@ export function useUnshield() {
   const { insufficient: lowSol } = useSolGate(MIN_PUBLIC_SOL_FOR_UNSHIELD)
   const { keysNotReady } = usePrivateKeysReady()
 
-  const balanceLabel = token
-    ? fromBaseUnits(token.amount, token.decimals)
-    : '—'
+  const balanceLabel = token ? fromBaseUnits(token.amount, token.decimals) : '—'
   const onMax = token
     ? () => setAmount(fromBaseUnits(token.amount, token.decimals))
     : undefined

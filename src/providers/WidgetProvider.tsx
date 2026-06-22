@@ -158,7 +158,5 @@ export function WidgetProvider({
     )
   }
 
-  return (
-    <QueryClientProvider client={queryClient}>{tree}</QueryClientProvider>
-  )
+  return <QueryClientProvider client={queryClient}>{tree}</QueryClientProvider>
 }

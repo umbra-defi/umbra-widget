@@ -9,6 +9,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import { SuccessOverlay } from '@/ui/success-overlay'
 import { BrandIcon } from '@/ui/brand-icon'
 import { Tabs, TabsList, TabsTrigger } from '@/ui/tabs'
+import { useText } from '@/text/text-context'
 import type { WidgetTab } from '@/types'
 import { RegistrationScreen } from '@/features/registration/components/RegistrationScreen'
 import { useRegistration } from '@/features/registration/hooks/use-registration'
@@ -18,14 +19,6 @@ import { ShieldTab } from '@/features/shield/components/ShieldTab'
 import { TransferTab } from '@/features/transfer/components/TransferTab'
 import { UnshieldTab } from '@/features/unshield/components/UnshieldTab'
 import { ReceiveTab } from '@/features/receive/components/ReceiveTab'
-
-const TAB_LABEL: Record<WidgetTab, string> = {
-  home: 'Home',
-  shield: 'Shield',
-  transfer: 'Transfer',
-  unshield: 'Unshield',
-  receive: 'Receive'
-}
 
 const TAB_VIEW: Record<WidgetTab, FC> = {
   home: HomeTab,
@@ -43,6 +36,7 @@ const EASE = [0.22, 1, 0.36, 1] as const
  * registration → tabs); each tab body cross-fades in.
  */
 export function WidgetBody({ tabs }: { tabs: WidgetTab[] }) {
+  const t = useText()
   const { isRegistered, isChecking } = useRegistration()
   // Registered → init the SDK client (derives/loads seed). Until it's ready,
   // show only the app icon.
@@ -93,9 +87,9 @@ export function WidgetBody({ tabs }: { tabs: WidgetTab[] }) {
           className='mb-1'
         >
           <TabsList>
-            {tabs.map((t) => (
-              <TabsTrigger key={t} value={t}>
-                {TAB_LABEL[t]}
+            {tabs.map((tab) => (
+              <TabsTrigger key={tab} value={tab}>
+                {t.tabs[tab]}
               </TabsTrigger>
             ))}
           </TabsList>

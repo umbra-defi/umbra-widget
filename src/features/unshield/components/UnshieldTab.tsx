@@ -1,15 +1,17 @@
 import { AmountField } from '@/ui/amount-field'
 import { Button } from '@/ui/button'
 import { useReportFlowStatus } from '@/providers/flow-status'
+import { useText } from '@/text/text-context'
 import { useUnshield } from '../hooks/use-unshield'
 
 export function UnshieldTab() {
   const u = useUnshield()
+  const t = useText().unshield
   useReportFlowStatus(u.status)
   return (
     <div className='flex flex-col gap-3'>
       <AmountField
-        label="You're Unshielding"
+        label={t.amountLabel}
         amount={u.amount}
         onAmountChange={u.setAmount}
         token={u.token}
@@ -19,8 +21,8 @@ export function UnshieldTab() {
         onMax={u.onMax}
       />
       <div className='flex items-center justify-between rounded-uw-md border border-uw-border px-4 py-3 text-sm'>
-        <span className='text-uw-text-secondary'>Unshielding Fee</span>
-        <span className='text-uw-text'>No Fee · $0.00</span>
+        <span className='text-uw-text-secondary'>{t.feeLabel}</span>
+        <span className='text-uw-text'>{t.feeValue}</span>
       </div>
       <Button
         loading={u.status === 'pending'}
@@ -28,10 +30,10 @@ export function UnshieldTab() {
         onClick={u.submit}
       >
         {u.status === 'pending'
-          ? 'Unshielding…'
+          ? t.submitPending
           : u.lowSol
-            ? 'Not enough SOL'
-            : 'Unshield'}
+            ? t.lowSol
+            : t.submit}
       </Button>
     </div>
   )

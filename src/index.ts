@@ -6,7 +6,10 @@ export type {
   WidgetMint,
   WidgetTab,
   WidgetUiConfig,
+  WidgetTextConfig,
   WidgetStorage,
   WidgetNetwork,
   WidgetEndpoints
 } from '@/types'
+export { DEFAULT_TEXT } from '@/text/defaults'
+export type { WidgetText } from '@/text/defaults'

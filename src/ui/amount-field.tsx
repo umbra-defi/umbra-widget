@@ -6,6 +6,7 @@ import { fromBaseUnits } from '@/lib/amount'
 import { TransferVerticalIcon } from '@/ui/icons'
 import { TokenSelect } from '@/ui/token-select'
 import { Skeleton } from '@/ui/skeleton'
+import { useText } from '@/text/text-context'
 
 interface AmountFieldProps {
   label: string
@@ -38,6 +39,7 @@ export function AmountField({
   onMax,
   className
 }: AmountFieldProps) {
+  const t = useText().amountField
   const [usdMode, setUsdMode] = useState(false)
   const [usdDraft, setUsdDraft] = useState('')
   const price = token?.price
@@ -104,7 +106,7 @@ export function AmountField({
           onClick={flip}
           disabled={!canUsd}
           className={cn('flex items-center gap-1', canUsd && 'text-uw-primary')}
-          title={canUsd ? 'Switch input currency' : undefined}
+          title={canUsd ? t.switchCurrency : undefined}
         >
           <TransferVerticalIcon />
           {usdMode
@@ -112,12 +114,8 @@ export function AmountField({
             : formatUsdValue(usdEquiv)}
         </button>
         <span className='flex min-w-0 items-center gap-1'>
-          Balance:{' '}
-          {balanceLoading ? (
-            <Skeleton className='h-3.5 w-12' />
-          ) : (
-            balanceLabel
-          )}
+          {t.balanceLabel}{' '}
+          {balanceLoading ? <Skeleton className='h-3.5 w-12' /> : balanceLabel}
           {onMax && (
             <>
               <span className='h-0.5 w-0.5 rounded-full bg-uw-text-tertiary' />
@@ -126,7 +124,7 @@ export function AmountField({
                 className='text-uw-primary'
                 onClick={handleMax}
               >
-                Max
+                {t.max}
               </button>
             </>
           )}

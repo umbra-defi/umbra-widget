@@ -20,9 +20,7 @@ export function useTransfer() {
   const { insufficient: lowSol } = useSolGate(MIN_PUBLIC_SOL_FOR_SEND)
   const { keysNotReady } = usePrivateKeysReady()
 
-  const balanceLabel = token
-    ? fromBaseUnits(token.amount, token.decimals)
-    : '—'
+  const balanceLabel = token ? fromBaseUnits(token.amount, token.decimals) : '—'
   const onMax = token
     ? () => setAmount(fromBaseUnits(token.amount, token.decimals))
     : undefined

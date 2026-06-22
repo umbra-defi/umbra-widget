@@ -22,7 +22,9 @@ export const keyConsistencyQueryKeys = {
 }
 
 export function useIsRestoringKeyConsistency(): boolean {
-  return useIsMutating({ mutationKey: keyConsistencyQueryKeys.restorePrefix }) > 0
+  return (
+    useIsMutating({ mutationKey: keyConsistencyQueryKeys.restorePrefix }) > 0
+  )
 }
 
 /**

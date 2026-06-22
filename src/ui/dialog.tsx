@@ -34,27 +34,27 @@ export const DialogContent = forwardRef<
   // the themed widget root, so it must carry the CSS vars itself.
   const themeVars = useThemeVars()
   return (
-  <DialogPortal>
-    <DialogOverlay />
-    <DialogPrimitive.Content
-      ref={ref}
-      className={cn(
-        'uw-root fixed left-1/2 top-1/2 z-50 w-[min(540px,94vw)] -translate-x-1/2 -translate-y-1/2',
-        'rounded-uw-lg border border-uw-border bg-uw-bg p-7 shadow-xl',
-        className
-      )}
-      style={{ ...themeVars, ...style }}
-      {...props}
-    >
-      <motion.div
-        initial={{ opacity: 0, scale: 0.97, y: 8 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+    <DialogPortal>
+      <DialogOverlay />
+      <DialogPrimitive.Content
+        ref={ref}
+        className={cn(
+          'uw-root fixed left-1/2 top-1/2 z-50 w-[min(540px,94vw)] -translate-x-1/2 -translate-y-1/2',
+          'rounded-uw-lg border border-uw-border bg-uw-bg p-7 shadow-xl',
+          className
+        )}
+        style={{ ...themeVars, ...style }}
+        {...props}
       >
-        {children}
-      </motion.div>
-    </DialogPrimitive.Content>
-  </DialogPortal>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.97, y: 8 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+        >
+          {children}
+        </motion.div>
+      </DialogPrimitive.Content>
+    </DialogPortal>
   )
 })
 DialogContent.displayName = 'DialogContent'

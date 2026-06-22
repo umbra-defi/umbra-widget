@@ -2,6 +2,8 @@ import { useMemo } from 'react'
 import type { UmbraWidgetProps, WidgetTab } from '@/types'
 import { uiToCssVars } from '@/theme/apply-theme'
 import { ThemeVarsContext } from '@/theme/theme-context'
+import { mergeText } from '@/text/defaults'
+import { TextContext } from '@/text/text-context'
 import { WidgetProvider } from '@/providers/WidgetProvider'
 import { WidgetBody } from '@/widget-body'
 import { Dialog, DialogContent, DialogTrigger } from '@/ui/dialog'
@@ -19,26 +21,29 @@ const ALL_TABS: WidgetTab[] = [
 
 /** Theme vars + the framed inner tree (provider, header, body, status ring). */
 function useWidgetShell(props: UmbraWidgetProps) {
-  const { ui, tabs } = props
+  const { ui, text, tabs } = props
   const themeVars = useMemo(() => uiToCssVars(ui), [ui])
+  const resolvedText = useMemo(() => mergeText(text), [text])
   const resolvedTabs = tabs?.length ? tabs : ALL_TABS
 
   const framed = (
     <FlowStatusProvider>
-      <ThemeVarsContext.Provider value={themeVars}>
-        <WidgetProvider
-          signer={props.signer}
-          rpcUrl={props.rpcUrl}
-          network={props.network}
-          mints={props.mints}
-          storage={props.storage}
-          endpoints={props.endpoints}
-          walletAddress={props.walletAddress}
-        >
-          {/* <WidgetHeader /> */}
-          <WidgetBody tabs={resolvedTabs} />
-        </WidgetProvider>
-      </ThemeVarsContext.Provider>
+      <TextContext.Provider value={resolvedText}>
+        <ThemeVarsContext.Provider value={themeVars}>
+          <WidgetProvider
+            signer={props.signer}
+            rpcUrl={props.rpcUrl}
+            network={props.network}
+            mints={props.mints}
+            storage={props.storage}
+            endpoints={props.endpoints}
+            walletAddress={props.walletAddress}
+          >
+            {/* <WidgetHeader /> */}
+            <WidgetBody tabs={resolvedTabs} />
+          </WidgetProvider>
+        </ThemeVarsContext.Provider>
+      </TextContext.Provider>
     </FlowStatusProvider>
   )
 

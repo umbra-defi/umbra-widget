@@ -1,4 +1,5 @@
 import { cn } from '@/ui/lib/utils'
+import { useText } from '@/text/text-context'
 
 interface StatusRowProps {
   status: 'idle' | 'pending' | 'success' | 'error'
@@ -14,6 +15,7 @@ export function StatusRow({
   signature,
   className
 }: StatusRowProps) {
+  const t = useText().status
   if (status === 'idle' || status === 'pending') return null
   return (
     <div
@@ -24,8 +26,8 @@ export function StatusRow({
       )}
     >
       {status === 'error'
-        ? (error?.message ?? 'Something went wrong')
-        : `Done${signature ? ` · ${signature.slice(0, 8)}…` : ''}`}
+        ? (error?.message ?? t.error)
+        : `${t.success}${signature ? ` · ${signature.slice(0, 8)}…` : ''}`}
     </div>
   )
 }

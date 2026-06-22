@@ -107,8 +107,7 @@ export function useSupportedTokens(
   const tokens = useMemo(
     () =>
       result.tokens.filter(
-        (t) =>
-          supported.has(t.mintAddress) && (!opts.nonZero || t.amount > 0n)
+        (t) => supported.has(t.mintAddress) && (!opts.nonZero || t.amount > 0n)
       ),
     [result.tokens, supported, opts.nonZero]
   )
