@@ -18,8 +18,8 @@ export function useIsRegistered() {
   return useQuery({
     queryKey: registeredKey(walletAddress),
     queryFn: async () => {
-      const { isRegistered } =
-        await services.sdkService.checkRegistrationOnChain(walletAddress)
+      const sdk = await services.getSdkService()
+      const { isRegistered } = await sdk.checkRegistrationOnChain(walletAddress)
       return isRegistered
     },
     staleTime: 30_000
@@ -44,7 +44,10 @@ export function useRegister() {
         client,
         toAddress(walletAddress)
       )
-      if (!already) await services.sdkService.registerUser(client)
+      if (!already) {
+        const sdk = await services.getSdkService()
+        await sdk.registerUser(client)
+      }
       return true
     },
     onSuccess: () =>

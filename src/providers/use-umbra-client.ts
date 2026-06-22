@@ -14,12 +14,13 @@ function init(ctx: ReturnType<typeof useWidgetContext>) {
   // Single-flight: the registration mutation and the ensure query may both call
   // this concurrently. `ensureClient` dedupes them to one `initPrivateMode`, so
   // the master seed is derived (and signed) exactly once.
-  return ctx.runtimeDeps.ensureClient(() =>
-    ctx.services.sdkService.initPrivateMode({
+  return ctx.runtimeDeps.ensureClient(async () => {
+    const sdk = await ctx.services.getSdkService()
+    return sdk.initPrivateMode({
       walletAddress: ctx.walletAddress,
       signer: ctx.walletSigner
     })
-  )
+  })
 }
 
 /**

@@ -21,8 +21,13 @@ import {
   createSdkService,
   isReceiverRegistered,
   decodeSolanaErrorMessage,
-  isRegisteredOnChain
+  isRegisteredOnChain,
+  getNetworkConfig,
+  type IUmbraClient,
+  type SdkService
 } from '@umbra-privacy/client/sdk'
+import { getRpcAccountInfoProvider } from '@umbra-privacy/sdk'
+import { getUserAccountQuerierFunction } from '@umbra-privacy/sdk/query'
 import type { SecureKeyValueStore } from '@umbra-privacy/client/ports'
 import type { RuntimeDepsHandle } from './runtime-deps'
 import type { SignerResolver } from './signer'
@@ -70,19 +75,42 @@ export function buildServices(deps: BuildServicesDeps) {
 
   const platform = createPlatform(endpoints)
 
-  const sdkService = createSdkService({
-    ctx,
-    getRegistrationProver: platform.getRegistrationProver,
-    secureStorage,
-    indexerEndpoint: endpoints.indexer,
-    storageVersion: STORAGE_VERSION,
-    storageBackend,
-    legacyMasterSeedSchemes: [legacyMasterSeedScheme],
-    // Sign current + legacy scheme messages once at client init (get-started)
-    // and cache both seeds — otherwise the legacy seed is derived lazily on the
-    // first UTXO scan, re-prompting a signature when the Receive tab opens.
-    signSchemeMessages: 'eager'
+  const userAccountQuerier = getUserAccountQuerierFunction({
+    client: {
+      networkConfig: getNetworkConfig(ctx.getNetwork() as 'mainnet' | 'devnet'),
+      accountInfoProvider: getRpcAccountInfoProvider({
+        rpcUrl: ctx.getRpcUrl()
+      })
+    } as unknown as IUmbraClient
   })
+
+  let sdkServicePromise: Promise<SdkService> | null = null
+  const getSdkService = () => {
+    if (sdkServicePromise) return sdkServicePromise
+    sdkServicePromise = (async () => {
+      let isNewUser = false
+      const addr = ctx.getCurrentAddress()
+      try {
+        if (addr) {
+          const account = await userAccountQuerier(toAddress(addr))
+          isNewUser = account.state === 'non_existent'
+        }
+      } catch {}
+      return createSdkService({
+        ctx,
+        getRegistrationProver: platform.getRegistrationProver,
+        secureStorage,
+        indexerEndpoint: endpoints.indexer,
+        storageVersion: STORAGE_VERSION,
+        storageBackend,
+        ...(isNewUser
+          ? {}
+          : { legacyMasterSeedSchemes: [legacyMasterSeedScheme] }),
+        signSchemeMessages: 'eager'
+      })
+    })()
+    return sdkServicePromise
+  }
 
   const shielding = shieldingQueries(createShieldingService({ ctx }), {
     getSigner: signerResolver,
@@ -134,7 +162,7 @@ export function buildServices(deps: BuildServicesDeps) {
   const token = tokenQueries(tokenService)
 
   return {
-    sdkService,
+    getSdkService,
     shielding,
     utxo,
     token,
